@@ -151,3 +151,18 @@ pets = [
      'borrower_id': None}
 ]
 
+user = [
+
+    {'user_id':     1,
+     'password':    'password'},
+    
+    {'user_id':     2,
+     'password':    'password'},
+
+    {'user_id':     3,
+     'password':    'password'},
+    
+    {'user_id':     4,
+     'password':    'password'}
+
+]
