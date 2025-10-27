@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Haustierverleih</title> <!-- Tab-Titel -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Provisorisch angelegt, gibt aber noch keine style.css -->
+</head>
+<body>
+
+    <h1>Haustierverleih</h1>
+    <p>Hier findest du unsere aktuellen Mietbewohner auf Zeit:</p>
+
+    <div class="pet-list"> <!-- Klassen in Vorbereitung für das Stylesheet -->
+        {% for pet in pets %} <!-- Schleife die über die mitgegebene Variable iteriert -->
+            <div class="pet-card">
+                <h2>{{ pet.name }} ({{ pet.animal_type }})</h2>
+                <p>{{ pet.description }}</p>
+
+                {% if pet.borrower_id is none %}
+                    <p><b>Frohlocket und lobet, {{ pet.name }} ist gerade verfügbar.</b></p>
+                {% endif %}
+
+                <p></p>
+                <a href="/pet/{{ pet.pet_id }}">Details ansehen</a>
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
