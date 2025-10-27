@@ -32,8 +32,19 @@ def delete_user():
     pass
 
 @app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
-def pet():
-    return render_template('pet_details.html', pets = pets)
+def pet(pet_id):
+    #die Daten anhand der id raussuchen
+    pet_details = None
+    for p in pets:
+        if p['pet_id'] == pet_id:
+            pet_details = p
+            break
+
+    if pet_details is None:
+        return render_template('404.html'), 404
+    
+    else:
+        return render_template('pet_details.html', pet = pet_details)
 
 @app.route('/pet/<int:pet_id>/edit')        #Seite zum Bearbeiten eines Tieres
 def pet_edit():
