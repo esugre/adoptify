@@ -33,7 +33,7 @@ def delete_user():
 
 @app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
 def pet():
-    pass
+    return render_template('pet_details.html', pets = pets)
 
 @app.route('/pet/<int:pet_id>/edit')        #Seite zum Bearbeiten eines Tieres
 def pet_edit():
@@ -70,7 +70,7 @@ def page_not_found(error):
 pets = [
 
     {'pet_id': 1,
-     'name': 'Fifi',
+     'name': 'Fiffi',
      'description': 'Sieht nett aus, ist es aber nicht!',
      'animal_type': 'dog',
      'owner_id': 1,
@@ -127,7 +127,7 @@ pets = [
 
     {'pet_id': 9,
      'name': 'Rex',
-     'description': 'Liebt Stöckchen – hasst, wenn sie physikalisch korrekt fliegen.',
+     'description': 'Liebt Stöckchen, aber hasst, wenn sie physikalisch korrekt fliegen.',
      'animal_type': 'dog',
      'owner_id': 1,
      'borrower_id': 2},

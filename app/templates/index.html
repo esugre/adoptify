@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Provisorisch angelegt, gibt aber noch keine style.css -->
 </head>
 <body>
-
+<!-- Bei Templates mit Jinja ist der übergebene Input standartmäßig escaped, das gut, mich freut x) -->
     <h1>Haustierverleih</h1>
     <p>Hier findest du unsere aktuellen Mietbewohner auf Zeit:</p>
 
@@ -17,11 +17,11 @@
                 <p>{{ pet.description }}</p>
 
                 {% if pet.borrower_id is none %}
-                    <p><b>Frohlocket und lobet, {{ pet.name }} ist gerade verfügbar.</b></p>
+                    <p><b>Jauchzet und frohlocket! {{ pet.name }} ist gerade verfügbar.</b></p>
                 {% endif %}
 
                 <p></p>
-                <a href="/pet/{{ pet.pet_id }}">Details ansehen</a>
+                <a href="/pet/{{ pet.pet_id }}">Samtpfotendetails</a> <!-- Link für Detailseite -->
             </div>
         {% endfor %}
     </div>
