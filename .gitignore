@@ -1,4 +1,6 @@
-*.log,
-*/venv/*,
-__pychache__/
+*.log
+*/venv/*
+__pycache__/
 venv/
+/venv/
+.env
