@@ -1,5 +1,5 @@
 from app import app
-from flask import Flask, render_template
+from flask import Flask, render_template, abort
 from markupsafe import escape, Markup
 
 @app.route('/')             #Startseite mit Liste aller Tiere
@@ -11,29 +11,29 @@ def index():
 
 @app.route('/login')        #Login-Seite
 def login():
-    pass
+    abort(404)  # Flask Funktion abort ruft unter dem jeweiligen Fehlercode den jeweiligen errorhandler auf, bis jetzt nur 404
 
 @app.route('/register')     #Seite zur Account-Erstellung
 def register():
-    pass
+    abort(404)
 
 @app.route('/logout')       #Null, aber braucht man für den Logout
 
 @app.route('/admin')        #Admin-Bereich
 def admin():
-    pass
+    abort(404)
 
-@app.route('/edit_user')    #Bearbeiten eines Benutzers
-def edit_user():
-    pass
+@app.route('/edit_user/<int:user_id>')    #Bearbeiten eines Benutzers
+def edit_user(user_id):
+    abort(404)
 
 @app.route('/delete_user/<int:user_id>')    #Null, braucht man fürs Löschen eines Nutzers
-def delete_user():
-    pass
+def delete_user(user_id):
+    abort(404)
 
 @app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
 def pet(pet_id):
-    #die Daten anhand der id raussuchen
+    #Daten anhand der id raussuchen
     pet_details = None
     for p in pets:
         if p['pet_id'] == pet_id:
@@ -41,26 +41,26 @@ def pet(pet_id):
             break
 
     if pet_details is None:
-        return render_template('404.html'), 404
+        abort(404)
     
     else:
         return render_template('pet_details.html', pet = pet_details)
 
 @app.route('/pet/<int:pet_id>/edit')        #Seite zum Bearbeiten eines Tieres
 def pet_edit(pet_id):
-    pass
+    abort(404)
 
 @app.route('/pet/<int:pet_id>/delete')      #Null, zum Löschen eines Tiers
-def delete_pet():
-    pass
+def delete_pet(pet_id):
+    abort(404)
 
 @app.route('/pet/<int:pet_id>/borrow')      #Null, zum Ausleihen
-def borrow_pet():
-    pass
+def borrow_pet(pet_id):
+    abort(404)
 
 @app.route('/pet/<int:pet_id>/return')      #Null, für die Rückgabe
-def return_pet():
-    pass
+def return_pet(pet_id):
+    abort(404)
 
 @app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
 def pet_management(user_id):
@@ -82,11 +82,11 @@ def pet_management(user_id):
         return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
     else:
-        return render_template('404.html'), 404
+        abort(404)
 
 @app.route('/pet/new/<int:user_id>')                      #Seite zum Anlegen neuer Tiere
-def pet_new():
-    pass
+def pet_new(user_id):
+    abort(404)
 
 @app.errorhandler(404)
 def page_not_found(error):
@@ -168,6 +168,10 @@ pets = [
      'owner_id': 4,
      'borrower_id': None}
 ]
+
+####################################
+
+# Temporäre Nutzerliste
 
 user = [
 
