@@ -1,5 +1,5 @@
 from app import app
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, abort, url_for
 from markupsafe import escape, Markup
 
 @app.route('/')             #Startseite mit Liste aller Tiere
@@ -11,25 +11,47 @@ def index():
 
 @app.route('/login')        #Login-Seite
 def login():
-    abort(404)  # Flask Funktion abort ruft unter dem jeweiligen Fehlercode den jeweiligen errorhandler auf, bis jetzt nur 404
+    
+    obrigkeit = '''
+    <!doctype html>
+    <html lang="de">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Login</title>
+    </head>
+    <body>
+        <h1>Hier findet sich - irgendwann in Zukunft - die Login-Seite</h1> 
+    '''
+
+    fußvolk = '''
+    <h2>Vielleicht findet sich hier aber auch das Elixir zur Nasenhaarentfernung UND Nasenhaarhinzuführung!!!</h2>
+    '''
+    userinput1 = "<script>alert('Kaufen Sie heute Ihr exklusives Starterpaket Nasenhaartonikum!!! Buy 1 Pay 2!!!');</script>" #not escaped Userinput
+    userinput2 = "Ich bin die traurige escaped Message: <script>alert('Kaufen Sie heute Ihr exklusives Starterpaket Nasenhaartonikum!!! Buy 1 Pay 2!!!');</script>" #escaped Userinput
+
+    output = Markup(obrigkeit) + Markup(userinput1) + escape(userinput2) + Markup(fußvolk)
+    return output
 
 @app.route('/register')     #Seite zur Account-Erstellung
 def register():
-    abort(404)
+    return "Hier können Sie sich registrieren."
 
 @app.route('/logout')       #Null, aber braucht man für den Logout
+def logout():
+    return "Hier werden Sie abgemeldet."
 
 @app.route('/admin')        #Admin-Bereich
 def admin():
-    abort(404)
+    return "Hier findet sich später das Admin-Dashboard."
 
 @app.route('/edit_user/<int:user_id>')    #Bearbeiten eines Benutzers
 def edit_user(user_id):
-    abort(404)
+    return "Hier findet sich die Nutzerbearbeitung."
 
 @app.route('/delete_user/<int:user_id>')    #Null, braucht man fürs Löschen eines Nutzers
 def delete_user(user_id):
-    abort(404)
+    return "Falls man mal einen Nutzer löschen muss."
 
 @app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
 def pet(pet_id):
@@ -48,45 +70,122 @@ def pet(pet_id):
 
 @app.route('/pet/<int:pet_id>/edit')        #Seite zum Bearbeiten eines Tieres
 def pet_edit(pet_id):
-    abort(404)
+    return "Die Tier-Bearbeitungs-Seite."
 
 @app.route('/pet/<int:pet_id>/delete')      #Null, zum Löschen eines Tiers
 def delete_pet(pet_id):
-    abort(404)
+    return "Falls man mal ein Tier löschen muss."
 
 @app.route('/pet/<int:pet_id>/borrow')      #Null, zum Ausleihen
 def borrow_pet(pet_id):
-    abort(404)
+    return "Wird benötigt wenn man ein Tier ausleihen möchte."
 
 @app.route('/pet/<int:pet_id>/return')      #Null, für die Rückgabe
 def return_pet(pet_id):
-    abort(404)
+    return "Wird für die Rückgabe benötigt."
 
-@app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
-def pet_management(user_id):
-    #Abgleich mit Tieren als Halter/Ausleiher
-    own_pets = []
-    borrowed_pets = []
-    for p in pets:
-        if p['owner_id'] == user_id:
-            own_pets.append(p)
-        elif p['borrower_id'] == user_id:
-            borrowed_pets.append(p)
+# @app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
+# def pet_management(user_id):
+#     #Abgleich mit Tieren als Halter/Ausleiher
+#     own_pets = []
+#     borrowed_pets = []
+#     for p in pets:
+#         if p['owner_id'] == user_id:
+#             own_pets.append(p)
+#         elif p['borrower_id'] == user_id:
+#             borrowed_pets.append(p)
     
-    vorhanden = False
-    for u in user:
-        if u['user_id'] == user_id:
-            vorhanden = True
-            break
-    if vorhanden:
-        return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
+#     vorhanden = False
+#     for u in user:
+#         if u['user_id'] == user_id:
+#             vorhanden = True
+#             break
+#     if vorhanden:
+#         return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
-    else:
-        abort(404)
+#     else:
+#         abort(404)
 
-@app.route('/pet/new/<int:user_id>')                      #Seite zum Anlegen neuer Tiere
+##################################################################
+
+@app.route('/pet-management/<int:user_id>')
+def pet_management(user_id):
+
+    #Abgleich mit Tieren als Halter/Ausleiher
+        own_pets = []
+        borrowed_pets = []
+        for p in pets:
+            if p['owner_id'] == user_id:
+                own_pets.append(p)
+            elif p['borrower_id'] == user_id:
+                borrowed_pets.append(p)
+
+        # Listen-HTML basteln
+        own_list = ' '.join(
+            f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>" 
+            for p in own_pets) or "<p>Leider hast du noch keine Tierfreunde.</p>"
+
+        borrowed_list = ' '.join(
+            f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>"
+            for p in borrowed_pets) or "<p>Leider hast du keine geliehenen Tierfreunde.</p>"
+
+
+
+        html = f"""<!DOCTYPE html>
+    <html lang="de">
+    <head>
+    <meta charset="UTF-8">
+    <title>Tierverwaltung von {escape(user_id)}</title>
+    </head>
+    <body>
+    <a href="/">Startseite</a>
+
+    <h1>Tierverwaltung von Nutzer {escape(user_id)}</h1>
+
+    <div class="pet-list">
+        <h2>Hier findest du deine Haustiere:</h2>
+        <a href="/pet/new/{escape(user_id)}">Neuen Freund anlegen</a>
+        <br><br>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Tierart</th>
+                <th>Verfügbarkeit</th>
+                <th>Aktionen</th>
+            <tr>
+            <tr>
+            """
+        for p in own_pets:
+            html += f"<td>{escape(p['name'])}</td>"
+            html += f"<td>{escape(p['animal_type'])}</td>"
+            
+            if p['borrower_id'] is None:
+
+                html += "<td>verfügbar</td>"
+            else:
+                html += "<td>ausgeliehen</td>"
+
+            html += f"<td><a href='{url_for(pet/p['pet_id']/edit)}'>Bearbeiten</a>
+        
+
+    #         </tr>
+    #     </table>
+
+    #     <h2>Hier findest du deine ausgeliehenen Tiere:</h2>
+    #     <ul>
+    #     {borrowed_list}
+    #     </ul>
+    # </div>
+    # </body>
+    # </html>
+
+        return html
+
+##################################################################
+
+@app.route('/pet/new/<int:user_id>')                   #Seite zum Anlegen neuer Tiere
 def pet_new(user_id):
-    abort(404)
+    return "Wenn ein neues Tier angelegt wird, dann hier."
 
 @app.errorhandler(404)
 def page_not_found(error):

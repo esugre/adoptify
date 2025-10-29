@@ -27,14 +27,14 @@
 
                 {% for pet in own_pets %}
                 <tr>
-                    <th>{{ pet.name }}</th>
-                    <th>{{ pet.animal_type }}</th>
+                    <td>{{ pet.name }}</td>
+                    <td>{{ pet.animal_type }}</td>
                     {% if pet.borrower_id is none %}
-                    <th>verfügbar</th>
+                    <td>verfügbar</td>
                     {% else %}
-                    <th>ausgeliehen</th>
+                    <td>ausgeliehen</td>
                     {% endif %}
-                    <th><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> <a href="/pet/{{ pet.pet_id }}">Details</a></th>
+                    <td><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> <a href="/pet/{{ pet.pet_id }}">Details</a></td>
                 </tr>
 
                 {% endfor %}
@@ -53,10 +53,10 @@
 
                 {% for pet in borrowed_pets %}
                 <tr>
-                    <th>{{ pet.name }}</th>
-                    <th>{{ pet.animal_type }}</th>
-                    <th>{{ pet.owner_id }}</th>
-                    <th> <a href="/pet/{{ pet.pet_id }}">Details</a></th>
+                    <td>{{ pet.name }}</td>
+                    <td>{{ pet.animal_type }}</td>
+                    <td>{{ pet.owner_id }}</td>
+                    <td> <a href="/pet/{{ pet.pet_id }}">Details</a></td>
                 </tr>
 
                 {% endfor %}
