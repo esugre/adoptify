@@ -47,7 +47,7 @@ def pet(pet_id):
         return render_template('pet_details.html', pet = pet_details)
 
 @app.route('/pet/<int:pet_id>/edit')        #Seite zum Bearbeiten eines Tieres
-def pet_edit():
+def pet_edit(pet_id):
     pass
 
 @app.route('/pet/<int:pet_id>/delete')      #Null, zum Löschen eines Tiers
@@ -62,11 +62,29 @@ def borrow_pet():
 def return_pet():
     pass
 
-@app.route('/pet-management')               #Verwaltung eigener und geliehener Tiere
-def pet_management():
-    pass
+@app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
+def pet_management(user_id):
+    #Abgleich mit Tieren als Halter/Ausleiher
+    own_pets = []
+    borrowed_pets = []
+    for p in pets:
+        if p['owner_id'] == user_id:
+            own_pets.append(p)
+        elif p['borrower_id'] == user_id:
+            borrowed_pets.append(p)
+    
+    vorhanden = False
+    for u in user:
+        if u['user_id'] == user_id:
+            vorhanden = True
+            break
+    if vorhanden:
+        return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
-@app.route('/pet/new')                      #Seite zum Anlegen neuer Tiere
+    else:
+        return render_template('404.html'), 404
+
+@app.route('/pet/new/<int:user_id>')                      #Seite zum Anlegen neuer Tiere
 def pet_new():
     pass
 

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Tierverwaltung</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <a href="/">Startseite</a>
+
+  <h1>Tierverwaltung</h1>
+  
+  <div class="pet-list"> <!-- Klasse in Vorbereitung fürs Stylesheet --> 
+
+    <h2>Hier findest du deine Haustiere:</h2>
+
+    <a href="/pet/new/{{ user_id }}">Neuen Freund anlegen</a>
+    <br></br>
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Tierart</th>
+                    <th>Verfügbarkeit</th>
+                    <th>Aktionen</th>
+                </tr>
+
+                {% for pet in own_pets %}
+                <tr>
+                    <th>{{ pet.name }}</th>
+                    <th>{{ pet.animal_type }}</th>
+                    {% if pet.borrower_id is none %}
+                    <th>verfügbar</th>
+                    {% else %}
+                    <th>ausgeliehen</th>
+                    {% endif %}
+                    <th><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> <a href="/pet/{{ pet.pet_id }}">Details</a></th>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+    
+    <h2>Hier findest du deine ausgeliehenen Haustiere:</h2>
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Tierart</th>
+                    <th>Besitzer-ID</th>
+                    <th>Aktionen</th>
+                </tr>
+
+                {% for pet in borrowed_pets %}
+                <tr>
+                    <th>{{ pet.name }}</th>
+                    <th>{{ pet.animal_type }}</th>
+                    <th>{{ pet.owner_id }}</th>
+                    <th> <a href="/pet/{{ pet.pet_id }}">Details</a></th>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+   </div>
+
+</body>
+</html>
