@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>User Management Dashboard</h1>
+
+    <table>
+        <tr>
+            <th>User-ID</th>
+            <th>Name</th>
+            <th>Rolle</th>
+            <th>Rechte bearbeiten</th>
+            <th>User löschen</th>
+        </tr>
+
+        {% for u in user %}
+        <tr>
+            <td>{{ u.user_id }}</td>
+            <td>{{ u.name }}</td>
+            <td>{{ u.group }}</td>
+            <td><a href="{{ url_for('edit_user', user_id=u.user_id) }}">Bearbeiten</a></td>
+            <td><a href="{{ url_for('delete_user', user_id=u.user_id) }}">Löschen</a></td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+{% endblock %}

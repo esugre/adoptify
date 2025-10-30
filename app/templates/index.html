@@ -2,7 +2,8 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Haustierverleih</title> <!-- Tab-Titel -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adoptify Haustierverleih</title> <!-- Tab-Titel -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Provisorisch angelegt, gibt aber noch keine style.css -->
 </head>
 <body>
@@ -13,15 +14,20 @@
     <div class="pet-list"> <!-- Klassen in Vorbereitung für das Stylesheet -->
         {% for pet in pets %} <!-- Schleife die über die mitgegebene Variable iteriert -->
             <div class="pet-card">
+                <div class="image-wrapper">
+                    <img src="{{ url_for('static', filename=pet['image']) }}">
+                </div>
                 <h2>{{ pet.name }} ({{ pet.animal_type }})</h2>
                 <p>{{ pet.description }}</p>
 
                 {% if pet.borrower_id is none %}
-                    <p><b>Jauchzet und frohlocket! {{ pet.name }} ist gerade verfügbar.</b></p>
+                    <p class="available-or-not"><b>💚 {{ pet.name }} ist verfügbar.</b></p>
+                {% else %}
+                    <p class="available-or-not"><b>💔 {{ pet.name }} ist verliehen.</b></p>
                 {% endif %}
 
                 <p></p>
-                <a href="/pet/{{ pet.pet_id }}">Samtpfotendetails</a> <!-- Link für Detailseite -->
+                <a href="/pet/{{ pet.pet_id }}" class="card-link">Details</a> <!-- Link für Detailseite -->
             </div>
         {% endfor %}
     </div>

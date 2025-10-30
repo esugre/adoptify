@@ -43,7 +43,9 @@ def logout():
 
 @app.route('/admin')        #Admin-Bereich
 def admin():
-    return "Hier findet sich später das Admin-Dashboard."
+    
+    # return "Hier findet sich später das Admin-Dashboard."
+    return render_template('admin.html', user = user)
 
 @app.route('/edit_user/<int:user_id>')    #Bearbeiten eines Benutzers
 def edit_user(user_id):
@@ -84,125 +86,114 @@ def borrow_pet(pet_id):
 def return_pet(pet_id):
     return "Wird für die Rückgabe benötigt."
 
-# @app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
-# def pet_management(user_id):
-#     #Abgleich mit Tieren als Halter/Ausleiher
-#     own_pets = []
-#     borrowed_pets = []
-#     for p in pets:
-#         if p['owner_id'] == user_id:
-#             own_pets.append(p)
-#         elif p['borrower_id'] == user_id:
-#             borrowed_pets.append(p)
+@app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
+def pet_management(user_id):
+    #Abgleich mit Tieren als Halter/Ausleiher
+    own_pets = []
+    borrowed_pets = []
+    for p in pets:
+        if p['owner_id'] == user_id:
+            own_pets.append(p)
+        elif p['borrower_id'] == user_id:
+            borrowed_pets.append(p)
     
-#     vorhanden = False
-#     for u in user:
-#         if u['user_id'] == user_id:
-#             vorhanden = True
-#             break
-#     if vorhanden:
-#         return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
+    vorhanden = False
+    for u in user:
+        if u['user_id'] == user_id:
+            vorhanden = True
+            break
+    if vorhanden:
+        return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
-#     else:
-#         abort(404)
+    else:
+        abort(404)
 
 ##################################################################
 
-@app.route('/pet-management/<int:user_id>')
-def pet_management(user_id):
+# @app.route('/pet-management/<int:user_id>')
+# def pet_management(user_id):
 
-    #Abgleich mit Tieren als Halter/Ausleiher
-        own_pets = []
-        borrowed_pets = []
-        for p in pets:
-            if p['owner_id'] == user_id:
-                own_pets.append(p)
-            elif p['borrower_id'] == user_id:
-                borrowed_pets.append(p)
+#     #Abgleich mit Tieren als Halter/Ausleiher
+#         own_pets = []
+#         borrowed_pets = []
+#         for p in pets:
+#             if p['owner_id'] == user_id:
+#                 own_pets.append(p)
+#             elif p['borrower_id'] == user_id:
+#                 borrowed_pets.append(p)
 
-        # # Listen-HTML basteln
-        # own_list = ' '.join(
-        #     f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>" 
-        #     for p in own_pets) or "<p>Leider hast du noch keine Tierfreunde.</p>"
+#         html = f"""<!DOCTYPE html>
+#     <html lang="de">
+#     <head>
+#     <meta charset="UTF-8">
+#     <title>Tierverwaltung von {escape(user_id)}</title>
+#     </head>
+#     <body>
+#     <a href="/">Startseite</a>
 
-        # borrowed_list = ' '.join(
-        #     f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>"
-        #     for p in borrowed_pets) or "<p>Leider hast du keine geliehenen Tierfreunde.</p>"
+#     <h1>Tierverwaltung von Nutzer {escape(user_id)}</h1>
 
-
-
-        html = f"""<!DOCTYPE html>
-    <html lang="de">
-    <head>
-    <meta charset="UTF-8">
-    <title>Tierverwaltung von {escape(user_id)}</title>
-    </head>
-    <body>
-    <a href="/">Startseite</a>
-
-    <h1>Tierverwaltung von Nutzer {escape(user_id)}</h1>
-
-    <div class="pet-list">
-        <h2>Hier findest du deine Haustiere:</h2>
-        <a href="/pet/new/{escape(user_id)}">Neuen Freund anlegen</a>
-        <br><br>
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Tierart</th>
-                <th>Verfügbarkeit</th>
-                <th>Aktionen</th>
-            </tr>
-            """
+#     <div class="pet-list">
+#         <h2>Hier findest du deine Haustiere:</h2>
+#         <a href="/pet/new/{escape(user_id)}">Neuen Freund anlegen</a>
+#         <br><br>
+#         <table>
+#             <tr>
+#                 <th>Name</th>
+#                 <th>Tierart</th>
+#                 <th>Verfügbarkeit</th>
+#                 <th>Aktionen</th>
+#             </tr>
+#             """
         
-        for p in own_pets:
-            html += "<tr>"
-            html += f"<td>{escape(p['name'])}</td>"
-            html += f"<td>{escape(p['animal_type'])}</td>"
-            if p['borrower_id'] is None:
-                html += "<td>verfügbar</td>"
-            else:
-                html += "<td>ausgeliehen</td>"
-            html += f"<td><a href='{url_for('pet_edit', pet_id=p['pet_id'])}'>Bearbeiten</a> <a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
-            html += "</tr>"
+#         for p in own_pets:
+#             html += "<tr>"
+#             html += f"<td>{escape(p['name'])}</td>"
+#             html += f"<td>{escape(p['animal_type'])}</td>"
+#             if p['borrower_id'] is None:
+#                 html += "<td>verfügbar</td>"
+#             else:
+#                 html += "<td>ausgeliehen</td>"
+#             html += f"<td><a href='{url_for('pet_edit', pet_id=p['pet_id'])}'>Bearbeiten</a> <a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
+#             html += "</tr>"
 
 
-        html += """
+#         html += """
         
-        </tr>
-        </table>
+#         </tr>
+#         </table>
 
-        <h2>Hier findest du deine ausgeliehenen Haustiere:</h2>
+#         <h2>Hier findest du deine ausgeliehenen Haustiere:</h2>
 
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Tierart</th>
-                <th>Besitzer-ID</th>
-                <th>Aktionen</th>
-            </tr>
+#         <table>
+#             <tr>
+#                 <th>Name</th>
+#                 <th>Tierart</th>
+#                 <th>Besitzer-ID</th>
+#                 <th>Aktionen</th>
+#             </tr>
             
-        """
+#         """
         
-        for p in borrowed_pets:
-            html += "<tr>"
-            html += f"<td>{escape(p['name'])}</td>"
-            html += f"<td>{escape(p['animal_type'])}</td>"
-            html += f"<td>{escape(p['owner_id'])}</td>"
-            html += f"<td><a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
-            html += "</tr>"
+#         for p in borrowed_pets:
+#             html += "<tr>"
+#             html += f"<td>{escape(p['name'])}</td>"
+#             html += f"<td>{escape(p['animal_type'])}</td>"
+#             html += f"<td>{escape(p['owner_id'])}</td>"
+#             html += f"<td><a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
+#             html += "</tr>"
 
-        html += """
+#         html += """
 
-        </tr>
-        </table
-        </div>
-        </body>
-        </html>
+#         </tr>
+#         </table
+#         </div>
+#         </body>
+#         </html>
 
-        """
+#         """
 
-        return html
+#         return html
 
 ##################################################################
 
@@ -225,70 +216,80 @@ pets = [
      'description': 'Sieht nett aus, ist es aber nicht!',
      'animal_type': 'dog',
      'owner_id': 1,
-     'borrower_id': None},
+     'borrower_id': None,
+     'image': 'bilder/fiffi.png'},
 
     {'pet_id': 2,
      'name': 'Herr Miezemann',
      'description': 'Philosophiert gern über den Sinn leerer Dosen.',
      'animal_type': 'cat',
      'owner_id': 2,
-     'borrower_id': None},
+     'borrower_id': None,
+     'image': 'bilder/herrmiezemann.png'},
 
     {'pet_id': 3,
      'name': 'Luna',
      'description': 'Verfolgt ihren eigenen Schatten mit religiösem Eifer.',
      'animal_type': 'dog',
      'owner_id': 1,
-     'borrower_id': 3},
+     'borrower_id': 3,
+     'image': 'bilder/luna.png'},
 
     {'pet_id': 4,
      'name': 'Pixel',
      'description': 'Hat einmal auf die Tastatur gepinkelt und denkt, sie programmiert jetzt.',
      'animal_type': 'cat',
      'owner_id': 2,
-     'borrower_id': None},
+     'borrower_id': None,
+     'image': 'bilder/pixel.png'},
 
     {'pet_id': 5,
      'name': 'Wuffbert',
      'description': 'Liebt es, Netflix zu spoilern, bevor du’s siehst.',
      'animal_type': 'dog',
      'owner_id': 3,
-     'borrower_id': None},
+     'borrower_id': None,
+     'image': 'bilder/wuffbert.png'},
 
     {'pet_id': 6,
      'name': 'Mausolini',
      'description': 'Winzig, aber führt ein strenges Regime in der Küche.',
      'animal_type': 'cat',
      'owner_id': 2,
-     'borrower_id': 4},
+     'borrower_id': 4,
+     'image': 'bilder/mausolini.png'},
 
     {'pet_id': 7,
      'name': 'Bella',
      'description': 'Hat mehr Instagram-Follower als du.',
      'animal_type': 'dog',
      'owner_id': 4,
-     'borrower_id': None},
+     'borrower_id': None,
+     'image': 'bilder/bella.png'},
 
     {'pet_id': 8,
      'name': 'Professor Flausch',
      'description': 'Schläft tagsüber, korrigiert nachts deine Lebensentscheidungen.',
      'animal_type': 'cat',
      'owner_id': 3,
-     'borrower_id': None},
+     'borrower_id': None,
+     'image': 'bilder/professorflausch.png'},
 
     {'pet_id': 9,
      'name': 'Rex',
      'description': 'Liebt Stöckchen, aber hasst, wenn sie physikalisch korrekt fliegen.',
      'animal_type': 'dog',
      'owner_id': 1,
-     'borrower_id': 2},
+     'borrower_id': 2,
+     'image': 'bilder/rex.png'},
 
     {'pet_id': 10,
      'name': 'Whiskerstein',
      'description': 'Hat eine tiefgehende Feindschaft mit dem Staubsauger entwickelt.',
      'animal_type': 'cat',
      'owner_id': 4,
-     'borrower_id': None}
+     'borrower_id': None,
+     'image': 'bilder/whiskerstein.png'}
 ]
 
 ####################################
@@ -298,15 +299,23 @@ pets = [
 user = [
 
     {'user_id':     1,
-     'password':    'password'},
+     'name':        'Ventura',
+     'password':    'password',
+     'group':       'admin'},
     
     {'user_id':     2,
-     'password':    'password'},
+     'name':        'Winfried',
+     'password':    'password',
+     'group':       'user'},
 
     {'user_id':     3,
-     'password':    'password'},
+     'name':        'Kunigunde',
+     'password':    'password',
+     'group':       'user'},
     
     {'user_id':     4,
-     'password':    'password'}
+     'name':        'Wilbald',
+     'password':    'password',
+     'group':       'user'},
 
 ]
