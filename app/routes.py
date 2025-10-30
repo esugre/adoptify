@@ -120,14 +120,14 @@ def pet_management(user_id):
             elif p['borrower_id'] == user_id:
                 borrowed_pets.append(p)
 
-        # Listen-HTML basteln
-        own_list = ' '.join(
-            f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>" 
-            for p in own_pets) or "<p>Leider hast du noch keine Tierfreunde.</p>"
+        # # Listen-HTML basteln
+        # own_list = ' '.join(
+        #     f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>" 
+        #     for p in own_pets) or "<p>Leider hast du noch keine Tierfreunde.</p>"
 
-        borrowed_list = ' '.join(
-            f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>"
-            for p in borrowed_pets) or "<p>Leider hast du keine geliehenen Tierfreunde.</p>"
+        # borrowed_list = ' '.join(
+        #     f"<tr><td>{escape(p['name'])} ({escape(p['animal_type'])})</td></tr>"
+        #     for p in borrowed_pets) or "<p>Leider hast du keine geliehenen Tierfreunde.</p>"
 
 
 
@@ -152,32 +152,55 @@ def pet_management(user_id):
                 <th>Tierart</th>
                 <th>Verfügbarkeit</th>
                 <th>Aktionen</th>
-            <tr>
-            <tr>
+            </tr>
             """
+        
         for p in own_pets:
+            html += "<tr>"
             html += f"<td>{escape(p['name'])}</td>"
             html += f"<td>{escape(p['animal_type'])}</td>"
-            
             if p['borrower_id'] is None:
-
                 html += "<td>verfügbar</td>"
             else:
                 html += "<td>ausgeliehen</td>"
+            html += f"<td><a href='{url_for('pet_edit', pet_id=p['pet_id'])}'>Bearbeiten</a> <a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
+            html += "</tr>"
 
-            html += f"<td><a href='{url_for(pet/p['pet_id']/edit)}'>Bearbeiten</a>
+
+        html += """
         
+        </tr>
+        </table>
 
-    #         </tr>
-    #     </table>
+        <h2>Hier findest du deine ausgeliehenen Haustiere:</h2>
 
-    #     <h2>Hier findest du deine ausgeliehenen Tiere:</h2>
-    #     <ul>
-    #     {borrowed_list}
-    #     </ul>
-    # </div>
-    # </body>
-    # </html>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Tierart</th>
+                <th>Besitzer-ID</th>
+                <th>Aktionen</th>
+            </tr>
+            
+        """
+        
+        for p in borrowed_pets:
+            html += "<tr>"
+            html += f"<td>{escape(p['name'])}</td>"
+            html += f"<td>{escape(p['animal_type'])}</td>"
+            html += f"<td>{escape(p['owner_id'])}</td>"
+            html += f"<td><a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
+            html += "</tr>"
+
+        html += """
+
+        </tr>
+        </table
+        </div>
+        </body>
+        </html>
+
+        """
 
         return html
 
