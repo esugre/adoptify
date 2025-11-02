@@ -24,8 +24,11 @@
       <header class="site-header">
         <nav class="nav">
           <div class="brand">
-            <a href="{{ url_for('index') }}" class="brand-name">Adoptify</a>
-            <span class="slogan">Love is great when you find someone to give it to</span>
+            <a href="{{ url_for('index') }}" class="brand-link">
+             <img src="{{ url_for('static', filename='icons/favicon-32x32.png') }}" alt="Adoptify Logo" class="brand-logo">
+             <span class="brand-name">Adoptify</span>
+            </a>
+             <span class="slogan">Love is great when you find someone to give it to</span>
           </div>
 
           <ul class="nav-links">

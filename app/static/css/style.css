@@ -72,7 +72,7 @@ display: block;                           /* Entfernt diesen weißen Rand unter 
 /* Navi-Styling */
 
 .site-header {                            /* Header Bereich der geweißelt wird mit ner kleinen grauen Trennlinie drunter */
-  background: #fff;
+  background: #fff8f0;                  /* Hellere Hintergrundfarbe, passend zum Logo */
   border-bottom: 1px solid #eee;
 }
 
@@ -92,8 +92,22 @@ display: block;                           /* Entfernt diesen weißen Rand unter 
 
 .brand {  
   display: flex;                          /* Flexbox für horizontale Anordnung */
-  align-items:baseline;                   /* Vertikale Ausrichtung an der Grundlinie der Schrift */
-  gap: .5rem;                             /* Abstand zwischen Brand-Name und Slogan */
+  align-items:center;                   /* statt baseline, damit logo, link und slogan selbe grundlinie haben */
+  gap: .75rem;                            /* Abstand zwischen Brand-Name und Slogan */
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  gap: .5rem;
+}
+
+.brand-logo {
+  height: 28px;
+  width: auto;
+  vertical-align: middle;               /* Vertikale Ausrichtung in der Mitte */
 }
 
 .brand-name {
