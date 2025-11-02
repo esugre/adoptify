@@ -9,17 +9,22 @@
 
     <body>
 
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('index') }}">Startseite</a></li>
-                <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('register') }}">Registrieren</a></li>
-                <li><a href="{{ url_for('admin') }}">Admin</a></li>
-    
+      <header class="site-header">
+        <nav class="nav">
+          <div class="brand">
+            <a href="{{ url_for('index') }}" class="brand-name">Adoptify</a>
+            <span class="slogan">Love is great when you find someone to give it to</span>
+          </div>
 
-
-            </ul>
+          <ul class="nav-links">
+            <li><a href="{{ url_for('index') }}">Startseite</a></li>
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Registrieren</a></li>
+            <li><a href="{{ url_for('admin') }}">Admin</a></li>
+          </ul>
         </nav>
+      </header>
+
 
         {% block content %}
         {% endblock %}

@@ -1,71 +1,133 @@
 
 
-html, body {
-  height: 100%;
-  margin: 0;
+html, body {                            /* Selbe Regeln für html als auch body */
+  height: 100%;                         /* Damit der Body so hoch ist wie das gesamte Fenster vom Browser */
+  margin: 0;                            /* Entfernt den Standard-Abstand nach Außen, wickeln den Browser um den Body quasi */
   background: var(--bg);
   color: var(--fg);
-  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; /*Schriftgröße 16px, Zeilenhöhe 1.5, Schriftarten als Fallback*/
 }
 
-.pet-list {
+.pet-list {                             /*Elternelement mit mehreren Tierkarten*/
 
-display: flex;
-margin: 30px;
-flex-flow: row wrap;
-justify-content: space-evenly;
-border: 1px solid #e3e3e3;
+display: flex;                          /* Flexbox, damit die Karten nebeneinander angeordnet werden*/
+margin: 30px;                           /* Rundherum Außenabstand von 30px zum restlichen Inhalt*/
+flex-flow: row wrap;                    /* Elemente in einer Reihe anordnen, bei Platzmangel umbrechen*/
+justify-content: space-evenly;          /* Gleichmäßiger Abstand zwischen den Karten*/
+border: 1px solid #e3e3e3;            /* Leichter Rahmen um die Liste der Karten*/
 }
 
-.pet-card {
+.pet-card {                             /* Styling für jede einzelne Karte */
 
-position:relative;
-display: flexbox;
-margin: 10px;
-padding: 15px;
-width: 300px;
-height: 400px;
-border: 1px solid #e3e3e3;
-
-}
-
-.pet-card h2 {
-
-margin-top: 0;
+position:relative;                      /*Boah, wie erklär ich das Later-Rafi... Fungiert als Bezugspunkt für absolute Positionierungen innerhalb der Karte (z.B. Verfügbarkeit unten)*/
+margin: 10px;                           /*10x Außenabstand rundherum zwischen den Karten*/
+padding: 15px;                          /*15px Innenabstand innerhalb der Karte*/
+width: 300px;                           /*Feste Breite der Karte*/
+height: 400px;                          /*Feste Höhe der Karte*/
+border: 1px solid #e3e3e3;            /*Leichter Rahmen um die Karte*/
 
 }
 
-.card-link {
+.pet-card h2 { 
 
-position: absolute;
-bottom: 15px;
-left: 15px;
+margin-top: 0;                          /* Entfernt den Standard-Abstand oben beim Überschriften-Element */
 
 }
 
-.available-or-not {
+.card-link {                            /* Macht die gesamte Karte anklickbar */
 
-position: absolute;
+position: absolute;                     /*fixiert den Link innerhalb der Karte unabhängig von anderen Elementen, deswegen brauchen wir den Bezugspunkt oben*/
+bottom: 15px;                           /* Abstand von unten innerhalb der Karte */
+left: 15px;                             /* Abstand von links innerhalb der Karte */
+
+}
+
+.available-or-not {                      /* Selbes Spiel wie bei den card-links */
+
+position: absolute; 
 bottom: 30px;
 
-text-align: center;
+text-align: center;                       /* Zentriert den Text innerhalb des Elements */
 
 }
 
-.image-wrapper {
+.image-wrapper {                          /* Container für das Bild innerhalb der Karte */
 
-width: 100%;
-height: 200px;
-overflow: hidden;
+width: 100%;                              /* Um die volle Breite der Karte auszunutzen */
+height: 200px;                            /* Aber fixe Höhe, für gleichmäßigere Karten*/
+overflow: hidden;                         /* Alles was über den Container schwengelt wird abgeschnibbelt */
 
 }
 
-.image-wrapper img {
+.image-wrapper img {                      /* Styling für das Bild im Container, zb Größenanpassung */
 
 width: 100%;
 height: 100%;
-object-fit: cover;
-object-position: center;
-display: block;
+object-fit: cover;                        /* Skaliert das Bild das es den Container voll ausfüllt */
+object-position: center;                  /* Zentriert das Bild im Container */
+display: block;                           /* Entfernt diesen weißen Rand unter dem Bild */
 
+}
+
+/* Navi-Styling */
+
+.site-header {                            /* Header Bereich der geweißelt wird mit ner kleinen grauen Trennlinie drunter */
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.nav {                                    /* Die ganze Navi-Leiste betreffend */
+  display: flex;                          /* Horizontale Anordnung */
+  align-items: center;                    /* Vertikale Zentrierung der Elemente */
+  padding: .75rem 1rem;                   /* Innenabstand oben/unten 0.75rem, links/rechts 1rem */
+  gap: 1rem;                              /* Abstand zwischen den Elementen */
+}
+
+/* rem -> "root em", also 1rem entspricht der Schriftgröße des html-Elements
+  Dadurch kann man seine Abstände relativ zu der genutzten Schriftgröße angeben.
+  Das ist super wenn man z.B. später die Schriftgröße ändert, dann passt sich alles über rem automatisch an. 
+*/
+
+/* Linke Seite mit Brand und Slogan */
+
+.brand {  
+  display: flex;                          /* Flexbox für horizontale Anordnung */
+  align-items:baseline;                   /* Vertikale Ausrichtung an der Grundlinie der Schrift */
+  gap: .5rem;                             /* Abstand zwischen Brand-Name und Slogan */
+}
+
+.brand-name {
+  font-weight: 700;                       /* Fettgedruckt */
+  text-decoration: none;                  /* Entfernt Unterstreichung */
+  color: inherit;                         /* Erbt die Textfarbe vom übergeordneten Element */
+}
+
+.slogan {
+  font-size: .9rem;                       /* Etwas kleinere Schriftgröße */
+  opacity: .7;                            /* Leicht transparent für dezenteren Look */
+  font-weight: 400;                       /* Normale Schriftstärke */
+}
+
+/* Rechte Seite mit der eigentlichen Navigation */
+
+.nav-links {
+  margin-left: auto;                      /* Schiebt die Links ganz nach rechts */
+  display: flex;                          /* Listenelemente nebeneinander setzen */
+  gap: 1rem;                              /* Abstand von 1rem zwischen den Links */
+  list-style: none;                       /* Schmeißt die Aufzählungspunkte raus */
+  padding: 0;                             /* Standard Innenabstand entfernen */
+  margin-top: 0; 
+  margin-bottom: 0;                       /* Standard Außenabstand oben und unten entfernen */
+}
+
+.nav-links a {
+  text-decoration: none;                  /* Unterstriche rausschmeißen */
+  padding: .5rem .75rem;                  /* Innenabstand de r Klickfläche */
+  border-radius: .5rem;                   /* Abgerundete Ecken, for the looook */
+  color: inherit;                         /* TExtfarbe erben */
+}
+
+.nav-links a:hover,                       /* Neu gelernt, bei Tastaturbedienung auch den Fokuszustand anpassen */
+.nav-links a:focus {
+  background: #f0f0f0;                  /* Heller Hintergrund beim Drüberfahren oder Fokussieren */
 }
