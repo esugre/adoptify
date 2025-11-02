@@ -217,7 +217,7 @@ pets = [
      'animal_type': 'dog',
      'owner_id': 1,
      'borrower_id': None,
-     'image': 'bilder/fiffi.png'},
+     'image': 'bilder/fiffi.jpg'},
 
     {'pet_id': 2,
      'name': 'Herr Miezemann',
@@ -225,15 +225,15 @@ pets = [
      'animal_type': 'cat',
      'owner_id': 2,
      'borrower_id': None,
-     'image': 'bilder/herrmiezemann.png'},
+     'image': 'bilder/herrmiezemann.jpg'},
 
     {'pet_id': 3,
      'name': 'Luna',
      'description': 'Verfolgt ihren eigenen Schatten mit religiösem Eifer.',
-     'animal_type': 'dog',
+     'animal_type': 'cat',
      'owner_id': 1,
      'borrower_id': 3,
-     'image': 'bilder/luna.png'},
+     'image': 'bilder/luna.jpg'},
 
     {'pet_id': 4,
      'name': 'Pixel',
@@ -241,7 +241,7 @@ pets = [
      'animal_type': 'cat',
      'owner_id': 2,
      'borrower_id': None,
-     'image': 'bilder/pixel.png'},
+     'image': 'bilder/pixel.jpg'},
 
     {'pet_id': 5,
      'name': 'Wuffbert',
@@ -249,7 +249,7 @@ pets = [
      'animal_type': 'dog',
      'owner_id': 3,
      'borrower_id': None,
-     'image': 'bilder/wuffbert.png'},
+     'image': 'bilder/wuffbert.jpg'},
 
     {'pet_id': 6,
      'name': 'Mausolini',
@@ -257,7 +257,7 @@ pets = [
      'animal_type': 'cat',
      'owner_id': 2,
      'borrower_id': 4,
-     'image': 'bilder/mausolini.png'},
+     'image': 'bilder/mausolini.jpg'},
 
     {'pet_id': 7,
      'name': 'Bella',
@@ -265,7 +265,7 @@ pets = [
      'animal_type': 'dog',
      'owner_id': 4,
      'borrower_id': None,
-     'image': 'bilder/bella.png'},
+     'image': 'bilder/bella.jpg'},
 
     {'pet_id': 8,
      'name': 'Professor Flausch',
@@ -273,7 +273,7 @@ pets = [
      'animal_type': 'cat',
      'owner_id': 3,
      'borrower_id': None,
-     'image': 'bilder/professorflausch.png'},
+     'image': 'bilder/professorflausch.jpg'},
 
     {'pet_id': 9,
      'name': 'Rex',
@@ -281,7 +281,7 @@ pets = [
      'animal_type': 'dog',
      'owner_id': 1,
      'borrower_id': 2,
-     'image': 'bilder/rex.png'},
+     'image': 'bilder/rex.jpg'},
 
     {'pet_id': 10,
      'name': 'Whiskerstein',
@@ -289,7 +289,7 @@ pets = [
      'animal_type': 'cat',
      'owner_id': 4,
      'borrower_id': None,
-     'image': 'bilder/whiskerstein.png'},
+     'image': 'bilder/whiskerstein.jpg'},
 
      {'pet_id': 11,
      'name': 'Günther',
@@ -297,7 +297,7 @@ pets = [
      'animal_type': 'porcupine',
      'owner_id': 2,
      'borrower_id': None,
-     'image': 'bilder/guenther.png'},
+     'image': 'bilder/guenther.jpg'},
 
     {'pet_id': 12,
      'name': 'Fräulein Schnapp',
@@ -305,7 +305,7 @@ pets = [
      'animal_type': 'crocodile',
      'owner_id': 3,
      'borrower_id': None,
-     'image': 'bilder/fraeuleinschnapp.png'},
+     'image': 'bilder/schnapp.jpg'},
 
     {'pet_id': 13,
      'name': 'Kevin',
@@ -313,7 +313,7 @@ pets = [
      'animal_type': 'octopus',
      'owner_id': 1,
      'borrower_id': None,
-     'image': 'bilder/kevin.png'},
+     'image': 'bilder/kevin.jpg'},
 
     {'pet_id': 14,
      'name': 'Herr Balduin',
@@ -321,7 +321,7 @@ pets = [
      'animal_type': 'boar',
      'owner_id': 4,
      'borrower_id': None,
-     'image': 'bilder/herrbalduin.png'},
+     'image': 'bilder/balduin.jpg'},
 
     {'pet_id': 15,
      'name': 'Samantha',
@@ -329,7 +329,7 @@ pets = [
      'animal_type': 'mantis',
      'owner_id': 2,
      'borrower_id': None,
-     'image': 'bilder/samantha.png'},
+     'image': 'bilder/samantha.jpg'},
 
     {'pet_id': 16,
      'name': 'Heinz',
@@ -337,7 +337,7 @@ pets = [
      'animal_type': 'emu',
      'owner_id': 3,
      'borrower_id': None,
-     'image': 'bilder/heinz.png'},
+     'image': 'bilder/heinz.jpg'},
 
     {'pet_id': 17,
      'name': 'Dr. Puff',
@@ -345,7 +345,7 @@ pets = [
      'animal_type': 'axolotl',
      'owner_id': 1,
      'borrower_id': None,
-     'image': 'bilder/drpuff.png'},
+     'image': 'bilder/drpuff.jpg'},
 
     {'pet_id': 18,
      'name': 'Greta',
@@ -353,7 +353,7 @@ pets = [
      'animal_type': 'goose',
      'owner_id': 4,
      'borrower_id': None,
-     'image': 'bilder/greta.png'},
+     'image': 'bilder/greta.jpg'},
 
     {'pet_id': 19,
      'name': 'Lord Krabbenstein',
@@ -361,7 +361,7 @@ pets = [
      'animal_type': 'crab',
      'owner_id': 3,
      'borrower_id': None,
-     'image': 'bilder/lordkrabbenstein.png'},
+     'image': 'bilder/lordkrabbenstein.jpg'},
 
     {'pet_id': 20,
      'name': 'Sigurd',
@@ -369,7 +369,7 @@ pets = [
      'animal_type': 'sloth',
      'owner_id': 2,
      'borrower_id': None,
-     'image': 'bilder/sigurd.png'}
+     'image': 'bilder/sigurd.jpg'}
 
 ]
 
