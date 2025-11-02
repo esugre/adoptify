@@ -1,7 +1,12 @@
-{% extends 'base.html' %}
-
-{% block content %}
-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tierverwaltung</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
   <a href="/">Startseite</a>
 
   <h1>Tierverwaltung</h1>
@@ -61,5 +66,5 @@
 
    </div>
 
-
-{% endblock %}
+</body>
+</html>

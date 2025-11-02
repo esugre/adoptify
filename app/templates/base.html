@@ -1,11 +1,19 @@
 <!doctype html>
-    <html lang="de">
+  <html lang="de">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-      <title>Title</title>
-      </head>
+      <title>Adoptify</title>
+    </head>
+
+
+  {% if session['user'] %}
+    <!-- Code, der nur für eingeloggte Benutzer angezeigt wird -->
+    <p>Willkommen, {{ session['user'] }}!</p>
+    <a href="/logout">Abmelden</a>
+
+  {% else %}
 
     <body>
 
@@ -17,10 +25,8 @@
           </div>
 
           <ul class="nav-links">
-            <li><a href="{{ url_for('index') }}">Startseite</a></li>
             <li><a href="{{ url_for('login') }}">Login</a></li>
             <li><a href="{{ url_for('register') }}">Registrieren</a></li>
-            <li><a href="{{ url_for('admin') }}">Admin</a></li>
           </ul>
         </nav>
       </header>
@@ -30,4 +36,8 @@
         {% endblock %}
    
     </body>
-    </html>
+
+  {% endif %}
+
+
+  </html>

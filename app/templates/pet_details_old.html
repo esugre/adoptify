@@ -1,8 +1,13 @@
-{% extends 'base.html' %}
-
-{% block content %}
-
-  <a href="/">..zurück zur Übersicht</a>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ pet.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <a href="/">Startseite</a>
 
   <h1>{{ pet.name }}</h1>
   <p><strong>Tierart:</strong> {{ pet.animal_type }}</p>
@@ -15,5 +20,5 @@
   {% else %}
     <p>Status: <b>Verliehen</b></p>
   {% endif %}
-
-{% endblock %}
+</body>
+</html>

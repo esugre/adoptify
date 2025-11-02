@@ -1,7 +1,13 @@
-{% extends 'base.html' %}
-
-{% block content %}
-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Adoptify Haustierverleih</title> <!-- Tab-Titel -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> <!-- Provisorisch angelegt, gibt aber noch keine style.css -->
+</head>
+<body>
+<!-- Bei Templates mit Jinja ist der übergebene Input standartmäßig escaped, das gut, mich freut x) -->
     <h1>Haustierverleih</h1>
     <p>Hier findest du unsere aktuellen Mietbewohner auf Zeit:</p>
 
@@ -26,4 +32,5 @@
         {% endfor %}
     </div>
 
-{% endblock %}
+</body>
+</html>
