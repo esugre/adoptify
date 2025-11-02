@@ -11,15 +11,7 @@
       <title>Adoptify</title>
     </head>
 
-
-  {% if session['user'] %}
-    <!-- Code, der nur für eingeloggte Benutzer angezeigt wird -->
-    <p>Willkommen, {{ session['user'] }}!</p>
-    <a href="{{ url_for('logout') }}">Abmelden</a>
-
-  {% else %}
-
-    <body>
+      <body>
 
       <header class="site-header">
         <nav class="nav">
@@ -28,23 +20,28 @@
              <img src="{{ url_for('static', filename='icons/favicon-32x32.png') }}" alt="Adoptify Logo" class="brand-logo">
              <span class="brand-name">Adoptify</span>
             </a>
+
+            {% if session['user'] %}
+             <span class="slogan">Willkommen zurück, {{ session['user'] }}!</span>
+            {% else %}
              <span class="slogan">Love is great when you find someone to give it to</span>
+            {% endif %}
           </div>
 
           <ul class="nav-links">
+            {% if session['user'] %}
+            <li><a href="{{ url_for('logout') }}">Abmelden</a></li>
+            <li><a href="{{ url_for('pet_management', user_id=session['user_id']) }}">Meine Haustiere</a></li>
+            {% else %}
             <li><a href="{{ url_for('login') }}">Login</a></li>
             <li><a href="{{ url_for('register') }}">Registrieren</a></li>
+            {% endif %}
           </ul>
         </nav>
       </header>
 
-
         {% block content %}
         {% endblock %}
-   
+
     </body>
-
-  {% endif %}
-
-
   </html>
