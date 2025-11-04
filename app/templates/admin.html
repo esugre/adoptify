@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
-
+{% block title %}Adoptify - Admin-Dashboard{% endblock %}
 {% block content %}
 
-<h1>User Management Dashboard</h1>
+<h1 class="admin-dashboard">User Management Dashboard</h1>
 
-    <table>
+    <table class="admin-dashboard">
         <tr>
             <th>User-ID</th>
             <th>Name</th>
             <th>Rolle</th>
-            <th>Rechte bearbeiten</th>
-            <th>User löschen</th>
+            <th>Rechte</th>
+            <th>User</th>
         </tr>
 
         {% for u in user %}
