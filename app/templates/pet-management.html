@@ -2,18 +2,15 @@
 {% block title %}Adoptify - Tierverwaltung{% endblock %}
 {% block content %}
 
-  <a href="/">Startseite</a>
-
-  <h1>Tierverwaltung</h1>
   
-  <div class=""> 
+  <div class="pet-management"> 
+  <h1>Tierverwaltung</h1>
 
-    <h2>Hier findest du deine Haustiere:</h2>
+    <h2>Deine Haustiere:</h2>
 
     <a href="/pet/new/{{ user_id }}">Neuen Freund anlegen</a> <!-- Momentan keinen Zugriff auf Nutzer von hier aus, dem Template wurde hier noch keine Info mitgegeben -->
-    <br></br>
 
-            <table class="">
+            <table>
                 <tr>
                     <th>Name</th>
                     <th>Tierart</th>
@@ -37,9 +34,9 @@
 
             </table>
     
-    <h2>Hier findest du deine ausgeliehenen Haustiere:</h2>
+    <h2>Deine ausgeliehenen Haustiere:</h2>
 
-            <table>
+            <table class="borrowed-pets-table">
                 <tr>
                     <th>Name</th>
                     <th>Tierart</th>
