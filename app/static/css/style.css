@@ -92,16 +92,16 @@ display: block;                           /* Entfernt diesen weißen Rand unter 
 
 .brand {  
   display: flex;                          /* Flexbox für horizontale Anordnung */
-  align-items:center;                   /* statt baseline, damit logo, link und slogan selbe grundlinie haben */
+  align-items:center;                     /* statt baseline, damit logo, link und slogan selbe grundlinie haben */
   gap: .75rem;                            /* Abstand zwischen Brand-Name und Slogan */
 }
 
 .brand-link {
   display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-  gap: .5rem;
+  align-items: center;                    /* Vertikale Zentrierung */
+  text-decoration: none;                  /* Entfernt Unterstreichung */
+  color: inherit;                         /* Erbt die Textfarbe vom übergeordneten Element */
+  gap: .5rem;                             /* Abstand zwischen Logo und Brand-Name */
 }
 
 .brand-logo {
@@ -144,4 +144,56 @@ display: block;                           /* Entfernt diesen weißen Rand unter 
 .nav-links a:hover,                       /* Neu gelernt, bei Tastaturbedienung auch den Fokuszustand anpassen */
 .nav-links a:focus {
   background: #f0f0f0;                  /* Heller Hintergrund beim Drüberfahren oder Fokussieren */
+}
+
+
+
+/* Zusätzliche Styles für die Admin-Dashboard und Tierverwaltungsseiten */
+
+.admin-dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-collapse: separate;              /* Getrennte Zellen, damit das Spacing funktionuckelt, collapse würde die Zellenränder der eigenen mit den Nachbarszellen verschmelzen */
+  border-spacing: 15px 0px;               /* Abstand zwischen den Spalten 15px, und oben/unten 0 Abstände */
+}
+
+.pet-management {
+  display: flex;
+  flex-direction: column;                 /* Vertikale Anordnung der Elemente */
+  align-items: center;                    /* Zentriert die Elemente horizontal */
+  gap: 20px;                              /* Abstand von 20px zwischen den Elementen */
+}
+
+.pet-management table {
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+  border-collapse: separate;             /* Getrennte Zellen, damit das Spacing funktionuckelt, collapse würde die Zellenränder der eigenen mit den Nachbarszellen verschmelzen */
+  border-spacing: 15px 0px;              /* Abstand zwischen den Spalten 15px, und oben/unten 0 Abstände */
+}
+
+.borrowed-pets-table {
+  margin-bottom: 60px;                   /* Abstand von unten, damit es nicht so gequetscht aussieht */
+}
+
+.index-head {
+  display: flex;
+  flex-direction: column;                /* Vertikale Anordnung der Elemente */
+  align-items: center;                   /* Abstand nach unten, damit es nicht so gequetscht aussieht */
+}
+
+.pet-details {
+  display: flex;
+  gap: 30px;                             /* Abstand zwischen Bild und Text */
+  margin: 0 auto;                        /* Zentriert den gesamten Container horizontal */
+  padding: 1rem;                         /* Innenabstand rundherum */
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;                      /* Abstand von oben */
+}
+
+.pet-image img {
+  max-width: 500px;
+  height: auto;
 }
