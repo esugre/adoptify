@@ -3,10 +3,12 @@
 
 {% block content %}
 
-    <h1>Haustierverleih</h1>
-    <p>Hier findest du unsere aktuellen Mietbewohner auf Zeit:</p>
-
-    <div class="pet-list"> <!-- Klassen in Vorbereitung für das Stylesheet -->
+    <div class="index-head">
+    <h1>Willkommen bei Adoptify Pet-Sharing</h1>
+    <p>Hier findest du unsere aktuellen "Mietbewohner" auf Zeit:</p>
+    </div>
+        
+    <div class="pet-list">
         {% for pet in pets %} <!-- Schleife die über die mitgegebene Variable iteriert -->
             <div class="pet-card">
                 <div class="image-wrapper">
