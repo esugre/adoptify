@@ -1,5 +1,5 @@
 from app import app
-from flask import Flask, render_template, abort, url_for
+from flask import Flask, render_template, abort, url_for, request, redirect
 from markupsafe import escape, Markup
 
 @app.route('/')             #Startseite mit Liste aller Tiere
@@ -70,9 +70,28 @@ def pet(pet_id):
     else:
         return render_template('pet_details.html', pet = pet_details)
 
-@app.route('/pet/<int:pet_id>/edit')        #Seite zum Bearbeiten eines Tieres
+@app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])        #Seite zum Bearbeiten eines Tieres
 def pet_edit(pet_id):
-    return "Die Tier-Bearbeitungs-Seite."
+    #Daten anhand der id raussuchen
+    pet_details = None
+    for p in pets:
+        if p['pet_id'] == pet_id:
+            pet_details = p
+            break
+
+    if pet_details is None:
+        abort(404)
+    
+    if request.method == 'POST':
+        #Dann sollen die Daten die in das Formular eingegeben werden übernommen werden, wie folgt:
+        pet_details['name'] = request.form['name']
+        pet_details['animal_type'] = request.form['animal_type']
+        pet_details['description'] = request.form['description']
+
+        #Weiterleitung / Zurück zur Tier-Verwaltung
+        return redirect(url_for('pet_management', user_id=pet_details['owner_id']))
+
+    return render_template('pet_edit.html', pet = pet_details)
 
 @app.route('/pet/<int:pet_id>/delete')      #Null, zum Löschen eines Tiers
 def delete_pet(pet_id):
@@ -369,7 +388,15 @@ pets = [
      'animal_type': 'sloth',
      'owner_id': 2,
      'borrower_id': None,
-     'image': 'bilder/sigurd.jpg'}
+     'image': 'bilder/sigurd.jpg'},
+
+     {'pet_id': 21,
+      'name': 'Weyland Slithers',
+      'description': 'Weyland, der passiv-aggressive Life-Coach in deinen vier Wänden. Sagt nichts, aber weiß genau über dein Versagen bescheid.',
+      'animal_type': 'snake',
+      'owner_id': 1, 
+      'borrower_id': 2,
+      'image': 'bilder/slithers.jpg'},
 
 ]
 
