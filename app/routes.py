@@ -8,15 +8,28 @@ def get_db_connection():            # Funktion die eine Verbindung zur Datenbank
     connection = mysql.connector.connect(
         host="localhost",
         user="adoptify",
-        passwort="bananenboot",
+        password="bananenboot",
         database="adoptify"
     )
     return connection
 
-@app.route('/')             #Startseite mit Liste aller Tiere
-def index():
+# @app.route('/')             #Startseite mit Liste aller Tiere
+# def index():
     
-    return render_template('index.html', pets=pets)     #Übergebe dem Template index.html die Variable pets
+#     return render_template('index.html', pets=pets)     #Übergebe dem Template index.html die Variable pets
+
+@app.route('/')
+def index():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''select 
+                   pet_id, name, description, animal_type, owner_id, image 
+                   from pets''')
+
+    pets = cursor.fetchall()
+    connection.close()
+
+    return render_template('index.html', pets=pets)
 
 @app.route('/login')        #Login-Seite
 def login():
@@ -50,11 +63,22 @@ def register():
 def logout():
     return "Hier werden Sie abgemeldet."
 
-@app.route('/admin')        #Admin-Bereich
-def admin():
+# @app.route('/admin')        #Admin-Bereich
+# def admin():
     
-    # return "Hier findet sich später das Admin-Dashboard."
-    return render_template('admin.html', user = user)
+#     return render_template('admin.html', user = user)
+
+@app.route('/admin')
+def admin():
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''select
+                   user_id, name, password, role
+                   from users''')
+    users = cursor.fetchall()
+    connection.close()
+
+    return render_template('admin.html', user=users)
 
 @app.route('/edit_user/<int:user_id>')    #Bearbeiten eines Benutzers
 def edit_user(user_id):
@@ -64,9 +88,31 @@ def edit_user(user_id):
 def delete_user(user_id):
     return "Falls man mal einen Nutzer löschen muss."
 
-@app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
+# @app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
+# def pet(pet_id):
+#     #Daten anhand der id raussuchen
+#     pet_details = None
+#     for p in pets:
+#         if p['pet_id'] == pet_id:
+#             pet_details = p
+#             break
+
+#     if pet_details is None:
+#         abort(404)
+    
+#     else:
+#         return render_template('pet_details.html', pet = pet_details)
+
+@app.route('/pet/<int:pet_id>')
 def pet(pet_id):
-    #Daten anhand der id raussuchen
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''select 
+                   pet_id, name, description, animal_type, owner_id, image 
+                   from pets''')
+    pets = cursor.fetchall()
+    connection.close()
+
     pet_details = None
     for p in pets:
         if p['pet_id'] == pet_id:
@@ -78,28 +124,72 @@ def pet(pet_id):
     
     else:
         return render_template('pet_details.html', pet = pet_details)
+        
 
-@app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])        #Seite zum Bearbeiten eines Tieres
+# @app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])        #Seite zum Bearbeiten eines Tieres
+# def pet_edit(pet_id):
+#     #Daten anhand der id raussuchen
+#     pet_details = None
+#     for p in pets:
+#         if p['pet_id'] == pet_id:
+#             pet_details = p
+#             break
+
+#     if pet_details is None:
+#         abort(404)
+    
+#     if request.method == 'POST':
+#         #Dann sollen die Daten die in das Formular eingegeben werden übernommen werden, wie folgt:
+#         pet_details['name'] = request.form['name']
+#         pet_details['animal_type'] = request.form['animal_type']
+#         pet_details['description'] = request.form['description']
+
+#         #Weiterleitung / Zurück zur Tier-Verwaltung
+#         return redirect(url_for('pet_management', user_id=pet_details['owner_id']))
+
+#     return render_template('pet_edit.html', pet = pet_details)
+
+@app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])
 def pet_edit(pet_id):
-    #Daten anhand der id raussuchen
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''select 
+                   pet_id, name, description, animal_type, owner_id, image 
+                   from pets''')
+    pets = cursor.fetchall()
+    connection.close()
+
     pet_details = None
     for p in pets:
         if p['pet_id'] == pet_id:
             pet_details = p
             break
-
+    
     if pet_details is None:
         abort(404)
-    
+
     if request.method == 'POST':
-        #Dann sollen die Daten die in das Formular eingegeben werden übernommen werden, wie folgt:
-        pet_details['name'] = request.form['name']
-        pet_details['animal_type'] = request.form['animal_type']
-        pet_details['description'] = request.form['description']
+        name = request.form['name']
+        animal_type = request.form['animal_type']
+        description = request.form['description']
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        
+        cursor.execute(
+            '''
+            update pets
+            set name = %s, animal_type = %s, description = %s
+            where pet_id = %s''',
+            (name, animal_type, description, pet_id)
+                       )
+        
+        connection.commit()
+        connection.close()
 
         #Weiterleitung / Zurück zur Tier-Verwaltung
         return redirect(url_for('pet_management', user_id=pet_details['owner_id']))
-
+    
     return render_template('pet_edit.html', pet = pet_details)
 
 @app.route('/pet/<int:pet_id>/delete')      #Null, zum Löschen eines Tiers
