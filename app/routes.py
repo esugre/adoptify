@@ -204,22 +204,80 @@ def borrow_pet(pet_id):
 def return_pet(pet_id):
     return "Wird für die Rückgabe benötigt."
 
-@app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
+# @app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
+# def pet_management(user_id):
+#     #Abgleich mit Tieren als Halter/Ausleiher
+#     own_pets = []
+#     borrowed_pets = []
+#     for p in pets:
+#         if p['owner_id'] == user_id:
+#             own_pets.append(p)
+#         elif p['borrower_id'] == user_id:
+#             borrowed_pets.append(p)
+    
+#     vorhanden = False
+#     for u in user:
+#         if u['user_id'] == user_id:
+#             vorhanden = True
+#             break
+#     if vorhanden:
+#         return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
+
+#     else:
+#         abort(404)
+
+@app.route('/pet-management/<int:user_id>')
 def pet_management(user_id):
-    #Abgleich mit Tieren als Halter/Ausleiher
+    # Pets Dictionary Import
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                   select
+                   pet_id, name, description, animal_type, owner_id, image
+                   from pets
+                   ''')
+    pets = cursor.fetchall()    # Pets Dict
+    connection.close()
+
+    # Borrowed Pets Dict Import
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    select 
+                   pet_id,
+                   borrower_id
+                   from borrowings
+                   ''')
+    borrowings = cursor.fetchall() # Borrowings Dict
+    connection.close()
+
+    # Zusammengestellte Listen die ich ggf. an das Template weitergebe
     own_pets = []
     borrowed_pets = []
+
     for p in pets:
         if p['owner_id'] == user_id:
             own_pets.append(p)
-        elif p['borrower_id'] == user_id:
-            borrowed_pets.append(p)
-    
+    for b in borrowings:
+        if b['borrower_id'] == user_id:
+            for p in pets:
+                if b['pet_id'] == p['pet_id']:
+                    borrowed_pets.append(p)
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    select * from users
+                   ''')
+    users = cursor.fetchall() # Userliste
+    connection.close()
+
     vorhanden = False
-    for u in user:
+    for u in users:
         if u['user_id'] == user_id:
             vorhanden = True
             break
+    
     if vorhanden:
         return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
