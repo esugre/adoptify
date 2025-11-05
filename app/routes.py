@@ -302,7 +302,7 @@ def pet_management(user_id):
             break
     
     if vorhanden:
-        return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
+        return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets, borrowings=borrowings)
 
     else:
         abort(404)
