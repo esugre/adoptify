@@ -26,10 +26,20 @@ def index():
                    pet_id, name, description, animal_type, owner_id, image 
                    from pets''')
 
-    pets = cursor.fetchall()
+    pets = cursor.fetchall() # Tierchenliste aus der Datenbank
     connection.close()
 
-    return render_template('index.html', pets=pets)
+    # Muss dem Template allerdings noch die Info mitgeben ob ein Tier auf der borrowings auftaucht
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    select * from borrowings
+                   ''')
+    
+    borrowings = cursor.fetchall() # Ausgeliehenen-Liste
+    connection.close()
+
+    return render_template('index.html', pets=pets, borrowings=borrowings)
 
 @app.route('/login')        #Login-Seite
 def login():
