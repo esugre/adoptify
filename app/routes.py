@@ -1,13 +1,22 @@
 from app import app
 from flask import Flask, render_template, abort, url_for, request, redirect
 from markupsafe import escape, Markup
+import mysql.connector
+
+
+def get_db_connection():            # Funktion die eine Verbindung zur Datenbank aufbaut und per Return zur Verfügung stellt. 
+    connection = mysql.connector.connect(
+        host="localhost",
+        user="adoptify",
+        passwort="bananenboot",
+        database="adoptify"
+    )
+    return connection
 
 @app.route('/')             #Startseite mit Liste aller Tiere
 def index():
     
     return render_template('index.html', pets=pets)     #Übergebe dem Template index.html die Variable pets
-
-        
 
 @app.route('/login')        #Login-Seite
 def login():
