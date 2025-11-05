@@ -15,7 +15,7 @@
       <p><strong>Beschreibung:</strong> {{ pet.description }}</p>
       <p><strong>Besitzer-ID:</strong> {{ pet.owner_id }}</p>
 
-      {% if pet.borrower_id is none %}
+      {% if not verliehen %}
         <p>Status: <b>Verfügbar</b></p>
         <a href="/pet/{{ pet.pet_id }}/borrow">Jetzt ausleihen</a>
       {% else %}
