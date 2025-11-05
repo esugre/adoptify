@@ -194,6 +194,13 @@ display: block;                           /* Entfernt diesen weißen Rand unter 
 }
 
 .pet-image img {
-  max-width: 500px;
+  max-width: 500px; 
   height: auto;
+}
+
+.edit-formular {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
