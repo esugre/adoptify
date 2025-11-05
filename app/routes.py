@@ -120,7 +120,15 @@ def pet(pet_id):
     cursor.execute('''select 
                    pet_id, name, description, animal_type, owner_id, image 
                    from pets''')
-    pets = cursor.fetchall()
+    pets = cursor.fetchall() # Tierchenliste aus der Datenbank 
+    connection.close()
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    select * from borrowings
+                   ''')
+    borrowings = cursor.fetchall() #Ausleihliste zum abchecken ob das pet gerade verliehen ist
     connection.close()
 
     pet_details = None
@@ -129,11 +137,16 @@ def pet(pet_id):
             pet_details = p
             break
 
+    verliehen = False
+    for data in borrowings:
+        if data['pet_id'] == pet_details['pet_id']:
+            verliehen = True
+
     if pet_details is None:
         abort(404)
     
     else:
-        return render_template('pet_details.html', pet = pet_details)
+        return render_template('pet_details.html', pet = pet_details, verliehen=verliehen)
         
 
 # @app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])        #Seite zum Bearbeiten eines Tieres
