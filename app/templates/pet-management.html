@@ -22,13 +22,7 @@
                 <tr>
                     <td>{{ pet.name }}</td>
                     <td>{{ pet.animal_type }}</td>
-                    {% for b in borrowings if b.pet_id == pet.pet_id %}
-                        {% if loop.first %}
-                            <td>ausgeliehen</td>
-                            {% endif %}
-                        {% else %}
-                            <td>verfügbar</td>
-                    {% endfor %}
+                    <td>{{ pet.status }}</td>
                     <td><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> <a href="/pet/{{ pet.pet_id }}">Details</a></td>
                 </tr>
 
