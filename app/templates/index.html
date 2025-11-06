@@ -11,25 +11,20 @@
     <div class="pet-list">
         {% for pet in pets %} <!-- Schleife die über die mitgegebene Variable iteriert -->
             <div class="pet-card">
+
                 <div class="image-wrapper">
                     <img src="{{ url_for('static', filename=pet['image']) }}">
                 </div>
+
                 <h2>{{ pet.name }} ({{ pet.animal_type }})</h2>
+
                 <p>{{ pet.description }}</p>
                 
-                {% for b in borrowings if b.pet_id == pet.pet_id %}
-                    {% if loop.first%}
-                        <p class="available-or-not"><b>💔 {{ pet.name }} ist verliehen.</b></p>
-                        {% endif %}
-                    {% else %}
-                        <p class="available-or-not"><b>💚 {{ pet.name }} ist verfügbar.</b></p>
-                {% endfor %}
-
-                <!-- {% if pet.borrower_id is none %}
-                    <p class="available-or-not"><b>💚 {{ pet.name }} ist verfügbar.</b></p>
-                {% else %}
+                {% if pet.is_borrowed %}
                     <p class="available-or-not"><b>💔 {{ pet.name }} ist verliehen.</b></p>
-                {% endif %} -->
+                {% else %}
+                    <p class="available-or-not"><b>💚 {{ pet.name }} ist verfügbar.</b></p>
+                {% endif %}
 
                 <p></p>
                 <a href="/pet/{{ pet.pet_id }}" class="card-link">Details</a> <!-- Link für Detailseite -->
