@@ -15,14 +15,14 @@
       <p><strong>Beschreibung:</strong> {{ pet.description }}</p>
       <p><strong>Besitzer-ID:</strong> {{ pet.owner_id }}</p>
 
-      {% if not verliehen %}
+      {% if not pet.is_borrowed %}
         <p>Status: <b>Verfügbar</b></p>
-        <a href="/pet/{{ pet.pet_id }}/borrow">Jetzt ausleihen</a>
+        <a href="/pet/{{ pet.pet_id }}/borrow">Ausleihen</a>
       {% else %}
         <p>Status: <b>Verliehen</b></p>
       {% endif %}
 
-      <a href="/pet/{{ pet.pet_id }}/edit">{{ pet.name }} bearbeiten</a>
+      <a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a>
 
     </section>
 
