@@ -4,7 +4,8 @@ from markupsafe import escape, Markup
 import mysql.connector
 
 
-def get_db_connection():            # Funktion die eine Verbindung zur Datenbank aufbaut und per Return zur Verfügung stellt. 
+#Funktion die eine Verbindung zur Datenbank aufbaut und per Return zur Verfügung stellt. 
+def get_db_connection():            
     connection = mysql.connector.connect(
         host="localhost",
         user="adoptify",
@@ -13,35 +14,38 @@ def get_db_connection():            # Funktion die eine Verbindung zur Datenbank
     )
     return connection
 
-# @app.route('/')             #Startseite mit Liste aller Tiere
-# def index():
-    
-#     return render_template('index.html', pets=pets)     #Übergebe dem Template index.html die Variable pets
 
+#Index-Seite - Verschlankt - Alle benötigten Infos in einem Abruf, ohne nachträgliches Filtern mittels Python/Jinja
 @app.route('/')
 def index():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('''select 
-                   pet_id, name, description, animal_type, owner_id, image 
-                   from pets''')
 
-    pets = cursor.fetchall() # Tierchenliste aus der Datenbank
-    connection.close()
-
-    # Muss dem Template allerdings noch die Info mitgeben ob ein Tier auf der borrowings auftaucht
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
     cursor.execute('''
-                    select * from borrowings
+                    select
+                   p.pet_id,
+                   p.name,
+                   p.description,
+                   p.animal_type,
+                   p.owner_id,
+                   p.image,
+                   exists (
+                   select 1
+                   from borrowings b
+                   where b.pet_id = p.pet_id
+                   ) as is_borrowed
+                   from pets p
+                   order by p.pet_id
                    ''')
     
-    borrowings = cursor.fetchall() # Ausgeliehenen-Liste
+    pets = cursor.fetchall()
     connection.close()
 
-    return render_template('index.html', pets=pets, borrowings=borrowings)
+    return render_template('index.html', pets=pets)
 
-@app.route('/login')        #Login-Seite
+
+#Login-Seite
+@app.route('/login')        
 def login():
     
     obrigkeit = '''
@@ -65,131 +69,91 @@ def login():
     output = Markup(obrigkeit) + Markup(userinput1) + escape(userinput2) + Markup(fußvolk)
     return output
 
-@app.route('/register')     #Seite zur Account-Erstellung
+
+#Seite zur Account-Erstellung
+@app.route('/register')     
 def register():
     return "Hier können Sie sich registrieren."
 
-@app.route('/logout')       #Null, aber braucht man für den Logout
+
+#Null, aber braucht man für den Logout
+@app.route('/logout')       
 def logout():
     return "Hier werden Sie abgemeldet."
 
-# @app.route('/admin')        #Admin-Bereich
-# def admin():
-    
-#     return render_template('admin.html', user = user)
 
+#User Management Dashboard
 @app.route('/admin')
 def admin():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     cursor.execute('''select
-                   user_id, name, password, role
+                   user_id, name, role
                    from users''')
     users = cursor.fetchall()
     connection.close()
 
     return render_template('admin.html', user=users)
 
-@app.route('/edit_user/<int:user_id>')    #Bearbeiten eines Benutzers
+
+#Bearbeiten eines Benutzers
+@app.route('/edit_user/<int:user_id>')    
 def edit_user(user_id):
     return "Hier findet sich die Nutzerbearbeitung."
 
-@app.route('/delete_user/<int:user_id>')    #Null, braucht man fürs Löschen eines Nutzers
+
+#Null, braucht man fürs Löschen eines Nutzers
+@app.route('/delete_user/<int:user_id>')    
 def delete_user(user_id):
     return "Falls man mal einen Nutzer löschen muss."
 
-# @app.route('/pet/<int:pet_id>')             #Zeigt die Details eines Tieres an
-# def pet(pet_id):
-#     #Daten anhand der id raussuchen
-#     pet_details = None
-#     for p in pets:
-#         if p['pet_id'] == pet_id:
-#             pet_details = p
-#             break
 
-#     if pet_details is None:
-#         abort(404)
-    
-#     else:
-#         return render_template('pet_details.html', pet = pet_details)
-
+# Pet-Details - Verschlankt - Nur noch ein Datensatz der aus der DB abgerufen wird.  
 @app.route('/pet/<int:pet_id>')
 def pet(pet_id):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('''select 
-                   pet_id, name, description, animal_type, owner_id, image 
-                   from pets''')
-    pets = cursor.fetchall() # Tierchenliste aus der Datenbank 
-    connection.close()
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
     cursor.execute('''
-                    select * from borrowings
-                   ''')
-    borrowings = cursor.fetchall() #Ausleihliste zum abchecken ob das pet gerade verliehen ist
+                    select
+                   p.pet_id,
+                   p.name,
+                   p.description,
+                   p.animal_type,
+                   p.owner_id,
+                   p.image,
+                   exists (
+                   select 1
+                   from borrowings b
+                   where b.pet_id = p.pet_id
+                   ) as is_borrowed
+                   from pets p
+                   where p.pet_id = %s''',
+                   (pet_id,) # execute möchte ein Tupel speisen, also vergesse er nicht ein Komma hinter der Variable, sonst rastet Python aus
+                   )
+    pet_details = cursor.fetchone()
     connection.close()
 
-    pet_details = None
-    for p in pets:
-        if p['pet_id'] == pet_id:
-            pet_details = p
-            break
-
-    verliehen = False
-    for data in borrowings:
-        if data['pet_id'] == pet_details['pet_id']:
-            verliehen = True
-
-    if pet_details is None:
-        abort(404)
+    return render_template('pet_details.html', pet=pet_details)
     
-    else:
-        return render_template('pet_details.html', pet = pet_details, verliehen=verliehen)
-        
 
-# @app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])        #Seite zum Bearbeiten eines Tieres
-# def pet_edit(pet_id):
-#     #Daten anhand der id raussuchen
-#     pet_details = None
-#     for p in pets:
-#         if p['pet_id'] == pet_id:
-#             pet_details = p
-#             break
-
-#     if pet_details is None:
-#         abort(404)
-    
-#     if request.method == 'POST':
-#         #Dann sollen die Daten die in das Formular eingegeben werden übernommen werden, wie folgt:
-#         pet_details['name'] = request.form['name']
-#         pet_details['animal_type'] = request.form['animal_type']
-#         pet_details['description'] = request.form['description']
-
-#         #Weiterleitung / Zurück zur Tier-Verwaltung
-#         return redirect(url_for('pet_management', user_id=pet_details['owner_id']))
-
-#     return render_template('pet_edit.html', pet = pet_details)
-
+# Tier Bearbeiten - Verschlankt - Daten mittels SQL vorsortiert
 @app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])
 def pet_edit(pet_id):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
-    cursor.execute('''select 
-                   pet_id, name, description, animal_type, owner_id, image 
-                   from pets''')
-    pets = cursor.fetchall()
-    connection.close()
-
-    pet_details = None
-    for p in pets:
-        if p['pet_id'] == pet_id:
-            pet_details = p
-            break
+    cursor.execute('''
+                    select
+                   name,
+                   description,
+                   animal_type,
+                   owner_id
+                   from pets
+                   where pet_id = %s''',
+                   (pet_id,)
+                   )
     
-    if pet_details is None:
-        abort(404)
+    pet = cursor.fetchone() #V1
+    connection.close()
 
     if request.method == 'POST':
         name = request.form['name']
@@ -198,412 +162,95 @@ def pet_edit(pet_id):
 
         connection = get_db_connection()
         cursor = connection.cursor()
-        
-        cursor.execute(
-            '''
-            update pets
-            set name = %s, animal_type = %s, description = %s
-            where pet_id = %s''',
-            (name, animal_type, description, pet_id)
+
+        cursor.execute('''
+                        update pets
+                       set name = %s,
+                       animal_type = %s,
+                       description = %s
+                       where pet_id = %s''',
+                       (name, animal_type, description, pet_id)
                        )
-        
         connection.commit()
         connection.close()
 
         #Weiterleitung / Zurück zur Tier-Verwaltung
-        return redirect(url_for('pet_management', user_id=pet_details['owner_id']))
+        return redirect(url_for('pet_management', user_id=pet['owner_id']))
     
-    return render_template('pet_edit.html', pet = pet_details)
+    return render_template('pet_edit.html', pet=pet)
 
-@app.route('/pet/<int:pet_id>/delete')      #Null, zum Löschen eines Tiers
+
+#Null, zum Löschen eines Tiers
+@app.route('/pet/<int:pet_id>/delete')      
 def delete_pet(pet_id):
     return "Falls man mal ein Tier löschen muss."
 
-@app.route('/pet/<int:pet_id>/borrow')      #Null, zum Ausleihen
+
+#Null, zum Ausleihen
+@app.route('/pet/<int:pet_id>/borrow')      
 def borrow_pet(pet_id):
     return "Wird benötigt wenn man ein Tier ausleihen möchte."
 
-@app.route('/pet/<int:pet_id>/return')      #Null, für die Rückgabe
+
+#Null, für die Rückgabe
+@app.route('/pet/<int:pet_id>/return')      
 def return_pet(pet_id):
     return "Wird für die Rückgabe benötigt."
 
-# @app.route('/pet-management/<int:user_id>')               #Verwaltung eigener und geliehener Tiere
-# def pet_management(user_id):
-#     #Abgleich mit Tieren als Halter/Ausleiher
-#     own_pets = []
-#     borrowed_pets = []
-#     for p in pets:
-#         if p['owner_id'] == user_id:
-#             own_pets.append(p)
-#         elif p['borrower_id'] == user_id:
-#             borrowed_pets.append(p)
-    
-#     vorhanden = False
-#     for u in user:
-#         if u['user_id'] == user_id:
-#             vorhanden = True
-#             break
-#     if vorhanden:
-#         return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
-#     else:
-#         abort(404)
-
+# Tierverwaltung - Verschlankt - Information direkt per SQL wie benötigt, statt mittels Python Loops after Loops...
 @app.route('/pet-management/<int:user_id>')
 def pet_management(user_id):
-    # Pets Dictionary Import
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     cursor.execute('''
-                   select
-                   pet_id, name, description, animal_type, owner_id, image
-                   from pets
-                   ''')
-    pets = cursor.fetchall()    # Pets Dict
-    connection.close()
-
-    # Borrowed Pets Dict Import
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''
-                    select 
-                   pet_id,
-                   borrower_id
-                   from borrowings
-                   ''')
-    borrowings = cursor.fetchall() # Borrowings Dict
-    connection.close()
-
-    # Zusammengestellte Listen die ich ggf. an das Template weitergebe
-    own_pets = []
-    borrowed_pets = []
-
-    for p in pets:
-        if p['owner_id'] == user_id:
-            own_pets.append(p)
-    for b in borrowings:
-        if b['borrower_id'] == user_id:
-            for p in pets:
-                if b['pet_id'] == p['pet_id']:
-                    borrowed_pets.append(p)
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-    cursor.execute('''
-                    select * from users
-                   ''')
-    users = cursor.fetchall() # Userliste
-    connection.close()
-
-    vorhanden = False
-    for u in users:
-        if u['user_id'] == user_id:
-            vorhanden = True
-            break
+                    select
+                        p.pet_id,
+                        p.name,
+                        p.animal_type,
+                        case
+                            when exists (
+                                select 1
+                                from borrowings b
+                                where b.pet_id = p.pet_id
+                                ) 
+                                then 'verliehen'
+                                else 'verfügbar'
+                            end as status
+                   from pets p
+                   where p.owner_id = %s''',
+                   (user_id,)
+                   )
     
-    if vorhanden:
-        return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets, borrowings=borrowings)
+    own_pets = cursor.fetchall() #V1 für Übersicht meiner Tiere und nur diese o_^
+    
+    cursor.execute('''
+                    select
+                        p.pet_id,
+                        p.name,
+                        p.animal_type,
+                        p.owner_id
+                    from pets p
+                    where pet_id in (
+                    select pet_id
+                    from borrowings
+                    where borrower_id = %s)''',
+                    (user_id,)
+                    )
 
-    else:
-        abort(404)
+    borrowed_pets = cursor.fetchall() #V2 für Übersicht meiner ausgeliehenen Tiere
+    connection.close()
 
-##################################################################
-
-# @app.route('/pet-management/<int:user_id>')
-# def pet_management(user_id):
-
-#     #Abgleich mit Tieren als Halter/Ausleiher
-#         own_pets = []
-#         borrowed_pets = []
-#         for p in pets:
-#             if p['owner_id'] == user_id:
-#                 own_pets.append(p)
-#             elif p['borrower_id'] == user_id:
-#                 borrowed_pets.append(p)
-
-#         html = f"""<!DOCTYPE html>
-#     <html lang="de">
-#     <head>
-#     <meta charset="UTF-8">
-#     <title>Tierverwaltung von {escape(user_id)}</title>
-#     </head>
-#     <body>
-#     <a href="/">Startseite</a>
-
-#     <h1>Tierverwaltung von Nutzer {escape(user_id)}</h1>
-
-#     <div class="pet-list">
-#         <h2>Hier findest du deine Haustiere:</h2>
-#         <a href="/pet/new/{escape(user_id)}">Neuen Freund anlegen</a>
-#         <br><br>
-#         <table>
-#             <tr>
-#                 <th>Name</th>
-#                 <th>Tierart</th>
-#                 <th>Verfügbarkeit</th>
-#                 <th>Aktionen</th>
-#             </tr>
-#             """
-        
-#         for p in own_pets:
-#             html += "<tr>"
-#             html += f"<td>{escape(p['name'])}</td>"
-#             html += f"<td>{escape(p['animal_type'])}</td>"
-#             if p['borrower_id'] is None:
-#                 html += "<td>verfügbar</td>"
-#             else:
-#                 html += "<td>ausgeliehen</td>"
-#             html += f"<td><a href='{url_for('pet_edit', pet_id=p['pet_id'])}'>Bearbeiten</a> <a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
-#             html += "</tr>"
+    return render_template('pet-management.html', own_pets=own_pets, borrowed_pets=borrowed_pets)
 
 
-#         html += """
-        
-#         </tr>
-#         </table>
-
-#         <h2>Hier findest du deine ausgeliehenen Haustiere:</h2>
-
-#         <table>
-#             <tr>
-#                 <th>Name</th>
-#                 <th>Tierart</th>
-#                 <th>Besitzer-ID</th>
-#                 <th>Aktionen</th>
-#             </tr>
-            
-#         """
-        
-#         for p in borrowed_pets:
-#             html += "<tr>"
-#             html += f"<td>{escape(p['name'])}</td>"
-#             html += f"<td>{escape(p['animal_type'])}</td>"
-#             html += f"<td>{escape(p['owner_id'])}</td>"
-#             html += f"<td><a href='{url_for('pet', pet_id=p['pet_id'])}'>Details</a></td>"
-#             html += "</tr>"
-
-#         html += """
-
-#         </tr>
-#         </table
-#         </div>
-#         </body>
-#         </html>
-
-#         """
-
-#         return html
-
-##################################################################
-
-@app.route('/pet/new/<int:user_id>')                   #Seite zum Anlegen neuer Tiere
+#Seite zum Anlegen neuer Tiere
+@app.route('/pet/new/<int:user_id>')                   
 def pet_new(user_id):
     return "Wenn ein neues Tier angelegt wird, dann hier."
 
+
+#Fallback auf die angelegte Fehlerseite
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
-
-###############################################
-
-# Liste mit Test-Haustieren
-
-pets = [
-
-    {'pet_id': 1,
-     'name': 'Fiffi',
-     'description': 'Sieht nett aus, ist es aber nicht!',
-     'animal_type': 'dog',
-     'owner_id': 1,
-     'borrower_id': None,
-     'image': 'bilder/fiffi.jpg'},
-
-    {'pet_id': 2,
-     'name': 'Herr Miezemann',
-     'description': 'Philosophiert gern über den Sinn leerer Dosen.',
-     'animal_type': 'cat',
-     'owner_id': 2,
-     'borrower_id': None,
-     'image': 'bilder/herrmiezemann.jpg'},
-
-    {'pet_id': 3,
-     'name': 'Luna',
-     'description': 'Verfolgt ihren eigenen Schatten mit religiösem Eifer.',
-     'animal_type': 'cat',
-     'owner_id': 1,
-     'borrower_id': 3,
-     'image': 'bilder/luna.jpg'},
-
-    {'pet_id': 4,
-     'name': 'Pixel',
-     'description': 'Hat einmal auf die Tastatur gepinkelt und denkt, sie programmiert jetzt.',
-     'animal_type': 'cat',
-     'owner_id': 2,
-     'borrower_id': None,
-     'image': 'bilder/pixel.jpg'},
-
-    {'pet_id': 5,
-     'name': 'Wuffbert',
-     'description': 'Liebt es, Netflix zu spoilern, bevor du’s siehst.',
-     'animal_type': 'dog',
-     'owner_id': 3,
-     'borrower_id': None,
-     'image': 'bilder/wuffbert.jpg'},
-
-    {'pet_id': 6,
-     'name': 'Mausolini',
-     'description': 'Winzig, aber führt ein strenges Regime in der Küche.',
-     'animal_type': 'cat',
-     'owner_id': 2,
-     'borrower_id': 4,
-     'image': 'bilder/mausolini.jpg'},
-
-    {'pet_id': 7,
-     'name': 'Bella',
-     'description': 'Hat mehr Instagram-Follower als du.',
-     'animal_type': 'dog',
-     'owner_id': 4,
-     'borrower_id': None,
-     'image': 'bilder/bella.jpg'},
-
-    {'pet_id': 8,
-     'name': 'Professor Flausch',
-     'description': 'Schläft tagsüber, korrigiert nachts deine Lebensentscheidungen.',
-     'animal_type': 'cat',
-     'owner_id': 3,
-     'borrower_id': None,
-     'image': 'bilder/professorflausch.jpg'},
-
-    {'pet_id': 9,
-     'name': 'Rex',
-     'description': 'Liebt Stöckchen, aber hasst, wenn sie physikalisch korrekt fliegen.',
-     'animal_type': 'dog',
-     'owner_id': 1,
-     'borrower_id': 2,
-     'image': 'bilder/rex.jpg'},
-
-    {'pet_id': 10,
-     'name': 'Whiskerstein',
-     'description': 'Hat eine tiefgehende Feindschaft mit dem Staubsauger entwickelt.',
-     'animal_type': 'cat',
-     'owner_id': 4,
-     'borrower_id': None,
-     'image': 'bilder/whiskerstein.jpg'},
-
-     {'pet_id': 11,
-     'name': 'Günther',
-     'description': 'Stachelschwein mit sanfter Seele. Kuschelt nicht aus Prinzip.',
-     'animal_type': 'porcupine',
-     'owner_id': 2,
-     'borrower_id': None,
-     'image': 'bilder/guenther.jpg'},
-
-    {'pet_id': 12,
-     'name': 'Fräulein Schnapp',
-     'description': 'Trägt Perlenkette und akzeptiert nur Badewannen in Marmoroptik.',
-     'animal_type': 'crocodile',
-     'owner_id': 3,
-     'borrower_id': None,
-     'image': 'bilder/schnapp.jpg'},
-
-    {'pet_id': 13,
-     'name': 'Kevin',
-     'description': 'Oktopus mit acht Armen, aber null Verantwortungsbewusstsein.',
-     'animal_type': 'octopus',
-     'owner_id': 1,
-     'borrower_id': None,
-     'image': 'bilder/kevin.jpg'},
-
-    {'pet_id': 14,
-     'name': 'Herr Balduin',
-     'description': 'Wildschwein mit feinem Geschmack. Frisst nur Bioabfall aus Überzeugung.',
-     'animal_type': 'boar',
-     'owner_id': 4,
-     'borrower_id': None,
-     'image': 'bilder/balduin.jpg'},
-
-    {'pet_id': 15,
-     'name': 'Samantha',
-     'description': 'Gottesanbeterin mit komplexem Beziehungsstatus. Sehr aufmerksam bis zum Schluss.',
-     'animal_type': 'mantis',
-     'owner_id': 2,
-     'borrower_id': None,
-     'image': 'bilder/samantha.jpg'},
-
-    {'pet_id': 16,
-     'name': 'Heinz',
-     'description': 'Emu mit Laufleidenschaft. Macht seine 20.000 Schritte noch vor Sonnenaufgang.',
-     'animal_type': 'emu',
-     'owner_id': 3,
-     'borrower_id': None,
-     'image': 'bilder/heinz.jpg'},
-
-    {'pet_id': 17,
-     'name': 'Dr. Puff',
-     'description': 'Axolotl mit akademischem Titel. Hält Vorträge über Wasserblasenästhetik.',
-     'animal_type': 'axolotl',
-     'owner_id': 1,
-     'borrower_id': None,
-     'image': 'bilder/drpuff.jpg'},
-
-    {'pet_id': 18,
-     'name': 'Greta',
-     'description': 'Gans mit Yoga-Diplom. Macht den Sonnengruß, schreit aber bei jedem Einatmen.',
-     'animal_type': 'goose',
-     'owner_id': 4,
-     'borrower_id': None,
-     'image': 'bilder/greta.jpg'},
-
-    {'pet_id': 19,
-     'name': 'Lord Krabbenstein',
-     'description': 'Königskrabbe mit Anspruch. Badewanne, bitte, und täglich frische Austern.',
-     'animal_type': 'crab',
-     'owner_id': 3,
-     'borrower_id': None,
-     'image': 'bilder/lordkrabbenstein.jpg'},
-
-    {'pet_id': 20,
-     'name': 'Sigurd',
-     'description': 'Faultier auf Probe. Antwortet selten, bewegt sich nie und ist trotzdem beliebt.',
-     'animal_type': 'sloth',
-     'owner_id': 2,
-     'borrower_id': None,
-     'image': 'bilder/sigurd.jpg'},
-
-     {'pet_id': 21,
-      'name': 'Weyland Slithers',
-      'description': 'Weyland, der passiv-aggressive Life-Coach in deinen vier Wänden. Sagt nichts, aber weiß genau über dein Versagen bescheid.',
-      'animal_type': 'snake',
-      'owner_id': 1, 
-      'borrower_id': 2,
-      'image': 'bilder/slithers.jpg'},
-
-]
-
-####################################
-
-# Temporäre Nutzerliste
-
-user = [
-
-    {'user_id':     1,
-     'name':        'Ventura',
-     'password':    'password',
-     'group':       'admin'},
-    
-    {'user_id':     2,
-     'name':        'Winfried',
-     'password':    'password',
-     'group':       'user'},
-
-    {'user_id':     3,
-     'name':        'Kunigunde',
-     'password':    'password',
-     'group':       'user'},
-    
-    {'user_id':     4,
-     'name':        'Wilbald',
-     'password':    'password',
-     'group':       'user'},
-
-]
