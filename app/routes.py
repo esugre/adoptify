@@ -1,7 +1,22 @@
+import os
+import mysql.connector
 from app import app
 from flask import Flask, render_template, abort, url_for, request, redirect
 from markupsafe import escape, Markup
-import mysql.connector
+from werkzeug.utils import secure_filename
+
+# Angabe des Upload-Folders für die Profilbilder der Tiere
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'app','static', 'bilder')
+# Größenlimit für die Bilder - 8MB
+app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024 
+# Erlaubte Dateien für den Upload
+allowed_extensions = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+
+
+#Überprüfungsfunktion ob das hochgeladene File eine zulässige Datei ist, nötig für den Bildupload in pet_new()
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
 #Funktion die eine Verbindung zur Datenbank aufbaut und per Return zur Verfügung stellt. 
@@ -245,12 +260,57 @@ def pet_management(user_id):
 
 
 #Seite zum Anlegen neuer Tiere
-@app.route('/pet/new/<int:user_id>')                   
+@app.route('/pet/new/<int:user_id>', methods=['GET', 'POST']) #Brauche hier eig. gar keine Get-Method     
 def pet_new(user_id):
-    return "Wenn ein neues Tier angelegt wird, dann hier."
 
+    if request.method == 'POST':
+
+        name = request.form['name']
+        animal_type = request.form['animal_type']
+        description = request.form['description']
+
+        #Standardmäßig kein Bild
+        image = None
+
+        #Bildupload - die Verwirrung ist groß
+        file = request.files['image']
+        if file and file.filename:
+            if allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+
+                #Ok, nochmal gucken ob der Ordner überhaupt existiert
+                upload_folder = app.config['UPLOAD_FOLDER']
+                os.makedirs(upload_folder, exist_ok=True)
+
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+
+                #Als String abspeichern
+                image = f"bilder/{filename}"
+            
+        #Speichern in der Datenbank
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        cursor.execute('''
+                        insert into pets (
+                            name, animal_type, description, owner_id, image)
+                            Values (%s, %s, %s, %s, %s)
+                        ''', (name, animal_type, description, user_id, image)
+                        )
+        
+        connection.commit()
+        connection.close()
+
+
+        #Weiterleitung / Zurück zur Tier-Verwaltung
+        return redirect(url_for('pet_management', user_id=user_id))
+
+    else:
+        return render_template('pet_new.html')
 
 #Fallback auf die angelegte Fehlerseite
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html'), 404
+
