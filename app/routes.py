@@ -12,7 +12,8 @@ app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 # Erlaubte Dateien für den Upload
 allowed_extensions = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
-
+#Temporäre globale user_id (nicht vergessen, die übergebenen user_ids wieder aus den routes zu löschen)
+user_id = 2
 
 #Überprüfungsfunktion ob das hochgeladene File eine zulässige Datei ist, nötig für den Bildupload in pet_new()
 def allowed_file(filename):
@@ -142,7 +143,15 @@ def pet(pet_id):
                    select 1
                    from borrowings b
                    where b.pet_id = p.pet_id
-                   ) as is_borrowed
+                   and b.active = 1
+                   ) as is_borrowed,
+                   (
+                   select b.borrower_id
+                   from borrowings b
+                   where b.pet_id = p.pet_id
+                   and b.active = 1
+                   limit 1
+                   ) as borrower_id
                    from pets p
                    where p.pet_id = %s''',
                    (pet_id,) # execute möchte ein Tupel speisen, also vergesse er nicht ein Komma hinter der Variable, sonst rastet Python aus
@@ -150,7 +159,7 @@ def pet(pet_id):
     pet_details = cursor.fetchone()
     connection.close()
 
-    return render_template('pet_details.html', pet=pet_details)
+    return render_template('pet_details.html', pet=pet_details, user_id=user_id) #user_id übergabe entfernen sobald sessions, nur temporär
     
 
 # Tier Bearbeiten - Verschlankt - Daten mittels SQL vorsortiert
@@ -221,8 +230,6 @@ def borrow_pet(pet_id):
     # if not user_id:
     #     abort(401) # Bitch, you're not logged in
 
-    user_id = 2 #provisorisch bis sessions integriert sind
-
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
@@ -259,10 +266,31 @@ def borrow_pet(pet_id):
         return redirect(url_for('pet', pet_id=pet_id))
 
 
-#Null, für die Rückgabe
-@app.route('/pet/<int:pet_id>/return')      
+@app.route('/pet/<int:pet_id>/return', methods=['GET', 'POST'])      
 def return_pet(pet_id):
-    return "Wird für die Rückgabe benötigt."
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute('''
+                    update borrowings 
+                   set active = 0
+                   where pet_id = %s
+                   and borrower_id = %s
+                   and active = 1
+                   ''', 
+                   (pet_id, user_id,)) #user_id temporär aus globaler Variable, später session_id
+    
+    connection.commit()
+    returned = cursor.rowcount #zählt die tatsächlich veränderten Datensätze, wenn erfolgreich dann >= 1
+    connection.close()
+
+    if returned >= 1:
+        flash("Tier wurde seinem Besitzer zurückgefaxt.", "success")
+    elif returned == 0:
+        flash("Hm, irgendwas stimmt hier nicht, bitte wende dich an den Betreiber", "error")
+
+    return redirect(url_for('pet', pet_id = pet_id))
 
 
 # Tierverwaltung - Verschlankt - Information direkt per SQL wie benötigt, statt mittels Python Loops after Loops...
