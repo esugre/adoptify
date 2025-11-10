@@ -1,7 +1,7 @@
 import os
 import mysql.connector
 from app import app
-from flask import Flask, render_template, abort, url_for, request, redirect
+from flask import Flask, render_template, abort, url_for, request, redirect, session, flash
 from markupsafe import escape, Markup
 from werkzeug.utils import secure_filename
 
@@ -11,6 +11,7 @@ app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'app','static', 'bilde
 app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024 
 # Erlaubte Dateien für den Upload
 allowed_extensions = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+
 
 
 #Überprüfungsfunktion ob das hochgeladene File eine zulässige Datei ist, nötig für den Bildupload in pet_new()
@@ -48,6 +49,7 @@ def index():
                    select 1
                    from borrowings b
                    where b.pet_id = p.pet_id
+                   and b.active = 1
                    ) as is_borrowed
                    from pets p
                    order by p.pet_id
@@ -213,9 +215,48 @@ def delete_pet(pet_id):
 
 
 #Null, zum Ausleihen
-@app.route('/pet/<int:pet_id>/borrow')      
+@app.route('/pet/<int:pet_id>/borrow', methods=['GET', 'POST'])
 def borrow_pet(pet_id):
-    return "Wird benötigt wenn man ein Tier ausleihen möchte."
+    # user_id = session.get('user_id') # Nur in Vorbereitung, noch keine Sessions implementiert
+    # if not user_id:
+    #     abort(401) # Bitch, you're not logged in
+
+    user_id = 2 #provisorisch bis sessions integriert sind
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    # Vorher überprüfen ob das Tier nicht eins von unseren ist... 
+    cursor.execute('''
+                    select case
+                   when owner_id = %s then 0
+                   else 1
+                   end as origin
+                   from pets 
+                   where pet_id = %s
+                   ''',
+                   (user_id, pet_id,)
+                   )
+    status = cursor.fetchone()
+
+    if not status or status['origin'] == 0:
+        flash("Du kannst dein eigenes Tier nicht ausleihen, Smartypants.", "error")
+        return redirect(url_for('pet', pet_id=pet_id))
+
+    if status:
+
+        cursor.execute('''
+                        insert into borrowings (pet_id, borrower_id)
+                    values (%s, %s)
+                    ''',
+                    (pet_id, user_id,)
+                    )
+    
+        connection.commit()
+        connection.close()
+
+        flash("Tier erfolgreich ausgeliehen!", "success")
+        return redirect(url_for('pet', pet_id=pet_id))
 
 
 #Null, für die Rückgabe
@@ -239,6 +280,7 @@ def pet_management(user_id):
                                 select 1
                                 from borrowings b
                                 where b.pet_id = p.pet_id
+                                and b.active = 1
                                 ) 
                                 then 'verliehen'
                                 else 'verfügbar'
@@ -259,8 +301,9 @@ def pet_management(user_id):
                     from pets p
                     where pet_id in (
                     select pet_id
-                    from borrowings
-                    where borrower_id = %s)''',
+                    from borrowings b
+                    where b.borrower_id = %s
+                    and b.active = 1)''',
                     (user_id,)
                     )
 
@@ -297,7 +340,7 @@ def pet_new(user_id):
                 file.save(filepath)
 
                 #Als String abspeichern
-                image = f"bilder/{filename}"
+                image = f"{filename}"
             
         #Speichern in der Datenbank
         connection = get_db_connection()
