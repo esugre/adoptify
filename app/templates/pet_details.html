@@ -5,7 +5,7 @@
   <div class="pet-details">
 
     <figure class="pet-image">
-       <img src="{{ url_for('static', filename=pet['image']) }}">
+       <img src="{{ url_for('static', filename='bilder/' ~ pet['image']) }}">
     </figure>
 
     <section class="pet-info">
