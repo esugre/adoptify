@@ -13,7 +13,7 @@
             <div class="pet-card">
 
                 <div class="image-wrapper">
-                    <img src="{{ url_for('static', filename=pet['image']) }}">
+                    <img src="{{ url_for('static', filename='bilder/' ~ pet['image']) }}"> <!-- ~ in Jinja der Concat Operator // + in Python zb -->
                 </div>
 
                 <h2>{{ pet.name }} ({{ pet.animal_type }})</h2>
