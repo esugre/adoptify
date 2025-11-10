@@ -6,7 +6,7 @@ from markupsafe import escape, Markup
 from werkzeug.utils import secure_filename
 
 # Angabe des Upload-Folders für die Profilbilder der Tiere
-app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'app','static', 'bilder')
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'bilder')
 # Größenlimit für die Bilder - 8MB
 app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024 
 # Erlaubte Dateien für den Upload
@@ -206,21 +206,55 @@ def pet_edit(pet_id):
     return render_template('pet_edit.html', pet=pet)
 
 
-#Null, zum Löschen eines Tiers
 @app.route('/pet/<int:pet_id>/delete', methods=['GET', 'POST'])      
 def delete_pet(pet_id):
+
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
+
+    #Erst Dateiname vom Bild aus der DB holen
     cursor.execute('''
-                    delete from pets
-                    where pet_id = %s
-                   ''',
+                    select owner_id, 
+                   image
+                   from pets
+                   where pet_id = %s''',
                    (pet_id,)
                    )
+    del_pet = cursor.fetchone()
+
+    if not del_pet:
+        connection.close()
+        flash("Hm, hier stimmt was nicht.", "error")
+        return redirect(url_for('index'))
+    
+    if del_pet['owner_id'] != user_id:
+        connection.close()
+        flash("Das ist nicht dein Tier, Finger weg!", "error")
+        return redirect(url_for('pet', pet_id=pet_id))
+    
+    image_dateiname = del_pet['image']
+
+    #Datensatz in DB löschen
+    cursor.execute('''
+                    delete from pets
+                   where pet_id = %s''',
+                   (pet_id,)
+                   )
+
     connection.commit()
     connection.close()
-    
-    return "How dare you wipe this wonderful creature from the face of the earth? But you did, congratulations... idiot!"
+
+    #Datei im Filesystem löschen - sofern vorhanden
+    if image_dateiname:
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_dateiname)
+        try:
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        except OSError:
+            pass
+
+    flash("Eintrag und Dateien wurden gelöscht.", "success")
+    return redirect(url_for('index'))
 
 
 #Null, zum Ausleihen
