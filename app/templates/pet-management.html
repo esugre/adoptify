@@ -23,7 +23,10 @@
                     <td>{{ pet.name }}</td>
                     <td>{{ pet.animal_type }}</td>
                     <td>{{ pet.status }}</td>
-                    <td><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> <a href="/pet/{{ pet.pet_id }}">Details</a></td>
+                    <td><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> 
+                        <a href="/pet/{{ pet.pet_id }}">Details</a>
+                        <a href="/pet/{{ pet.pet_id }}/delete">Löschen</a>
+                    </td>
                 </tr>
 
                 {% endfor %}
