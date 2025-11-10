@@ -196,9 +196,20 @@ def pet_edit(pet_id):
 
 
 #Null, zum Löschen eines Tiers
-@app.route('/pet/<int:pet_id>/delete')      
+@app.route('/pet/<int:pet_id>/delete', methods=['GET', 'POST'])      
 def delete_pet(pet_id):
-    return "Falls man mal ein Tier löschen muss."
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    delete from pets
+                    where pet_id = %s
+                   ''',
+                   (pet_id,)
+                   )
+    connection.commit()
+    connection.close()
+    
+    return "How dare you wipe this wonderful creature from the face of the earth? But you did, congratulations... idiot!"
 
 
 #Null, zum Ausleihen
