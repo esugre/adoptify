@@ -204,3 +204,18 @@ display: block;                           /* Entfernt diesen weißen Rand unter 
   align-items: center;
   justify-content: center;
 }
+
+/* Flash-Meldungen */
+.flashes .error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: red
+}
+
+.flashes .success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: green
+}
