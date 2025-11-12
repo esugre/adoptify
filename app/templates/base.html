@@ -33,20 +33,20 @@
              <span class="brand-name">Adoptify</span>
             </a>
 
-            {% if session['user'] %}
-             <span class="slogan">Willkommen zurück, {{ session['user'] }}!</span>
+            {% if session['name'] %}
+             <span class="slogan">Willkommen zurück, {{ session['name'] }}!</span>
             {% else %}
              <span class="slogan">Love is great when you find someone to give it to</span>
             {% endif %}
           </div>
 
           <ul class="nav-links">
-            {% if session['user'] %}
+            {% if session['name'] %}
             <li><a href="{{ url_for('logout') }}">Abmelden</a></li>
             <li><a href="{{ url_for('pet_management', user_id=session['user_id']) }}">Meine Haustiere</a></li>
             {% else %}
-            <li><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('register') }}">Registrieren</a></li>
+            <li><a href="{{ url_for('login_get') }}">Login</a></li>
+            <li><a href="{{ url_for('register_get') }}">Registrieren</a></li>
             {% endif %}
           </ul>
         </nav>
