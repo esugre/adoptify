@@ -4,6 +4,8 @@ from app import app
 from flask import Flask, render_template, abort, url_for, request, redirect, session, flash
 from markupsafe import escape, Markup
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 # Angabe des Upload-Folders für die Profilbilder der Tiere
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'bilder')
@@ -13,7 +15,7 @@ app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 allowed_extensions = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
 #Temporäre globale user_id (nicht vergessen, die übergebenen user_ids wieder aus den routes zu löschen)
-user_id = 2
+# user_id = 2
 
 #Überprüfungsfunktion ob das hochgeladene File eine zulässige Datei ist, nötig für den Bildupload in pet_new()
 def allowed_file(filename):
@@ -62,42 +64,101 @@ def index():
     return render_template('index.html', pets=pets)
 
 
-#Login-Seite
-@app.route('/login')        
-def login():
+#Seite zum Login-Aufruf
+@app.get('/login')        
+def login_get():
+    return render_template('login.html')
+
+
+#Login-Submit
+@app.post('/login')
+def login_post():
+    entered_username = request.form['username']
+    entered_password = request.form['password']
+
+    if not entered_username or not entered_password:
+        flash("Bitte Benutzername und Passwort eingeben.", "error")
+        return redirect(url_for('login_get'))
+
+    #Verbindung zur Datenbank um eingegeben Konto-Daten zu überprüfen
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    select * from users
+                   where name = %s
+                   ''',
+                   (entered_username,)
+                   )
+    user = cursor.fetchone()
+    connection.close()
+
+    if not user or not check_password_hash(user['password'], entered_password):
+        flash("Benutzer oder Passwort nicht korrekt.", "error")
+        return redirect(url_for('login_get'))
+
+    session.clear() #Session löschen, falls noch irgendwelche alten Daten drin sein könnten
+    session['user_id'] = int(user['user_id'])
+    session['name'] = user['name']
+    session['role'] = user['role']
+
+    flash(f"Du hast dich erfolgreich angemeldet {user['name']}!", "success")
+    return redirect(url_for('index'))
+
+
+#Seite zur Account-Erstellung Aufruf
+@app.get('/register')     
+def register_get():
+    return render_template('register.html')
+
+
+#Account-Erstellung - Submit
+@app.post('/register')
+def register_post():
+
+    choosen_username = request.form['username']
+    choosen_password = request.form['password']
+    hashed_password = generate_password_hash(choosen_password)      # Muss noch von werkzeug.utils importiert werden
+
+    #Datenbank-Verwurstung
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('''
+                    insert into users 
+                   (name, password) 
+                   values (%s, %s)
+                   ''', 
+                   (choosen_username, hashed_password)
+                   )
+    connection.commit()
+
+    #Abholen der user_id des gerade angelegten Nutzers
+    cursor.execute('''
+                    select user_id 
+                   from users
+                   where password = %s
+                   and name = %s
+                   ''',
+                   (hashed_password, choosen_username)
+                   )
+    user_id = cursor.fetchone()
+    connection.close()
     
-    obrigkeit = '''
-    <!doctype html>
-    <html lang="de">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Login</title>
-    </head>
-    <body>
-        <h1>Hier findet sich - irgendwann in Zukunft - die Login-Seite</h1> 
-    '''
 
-    fußvolk = '''
-    <h2>Vielleicht findet sich hier aber auch das Elixir zur Nasenhaarentfernung UND Nasenhaarhinzuführung!!!</h2>
-    '''
-    userinput1 = "<script>alert('Kaufen Sie heute Ihr exklusives Starterpaket Nasenhaartonikum!!! Buy 1 Pay 2!!!');</script>" #not escaped Userinput
-    userinput2 = "Ich bin die traurige escaped Message: <script>alert('Kaufen Sie heute Ihr exklusives Starterpaket Nasenhaartonikum!!! Buy 1 Pay 2!!!');</script>" #escaped Userinput
+    #Account-Infos in der Session speichern
+    session['user_id'] = user_id
+    session['username'] = choosen_username
 
-    output = Markup(obrigkeit) + Markup(userinput1) + escape(userinput2) + Markup(fußvolk)
-    return output
-
-
-#Seite zur Account-Erstellung
-@app.route('/register')     
-def register():
-    return "Hier können Sie sich registrieren."
+    return redirect(url_for('index'))
 
 
 #Null, aber braucht man für den Logout
 @app.route('/logout')       
 def logout():
-    return "Hier werden Sie abgemeldet."
+    session.clear()
+
+    flash("Du wurdest erfolgreich abgemeldet.", "success")
+    return redirect(url_for('index'))
 
 
 #User Management Dashboard
@@ -115,13 +176,13 @@ def admin():
 
 
 #Bearbeiten eines Benutzers
-@app.route('/edit_user/<int:user_id>')    
+@app.route('/edit_user/<int:user_id>')
 def edit_user(user_id):
     return "Hier findet sich die Nutzerbearbeitung."
 
 
 #Null, braucht man fürs Löschen eines Nutzers
-@app.route('/delete_user/<int:user_id>')    
+@app.route('/delete_user/<int:user_id>')
 def delete_user(user_id):
     return "Falls man mal einen Nutzer löschen muss."
 
@@ -159,7 +220,7 @@ def pet(pet_id):
     pet_details = cursor.fetchone()
     connection.close()
 
-    return render_template('pet_details.html', pet=pet_details, user_id=user_id) #user_id übergabe entfernen sobald sessions, nur temporär
+    return render_template('pet_details.html', pet=pet_details) 
     
 
 # Tier Bearbeiten - Verschlankt - Daten mittels SQL vorsortiert
@@ -206,7 +267,7 @@ def pet_edit(pet_id):
     return render_template('pet_edit.html', pet=pet)
 
 
-@app.route('/pet/<int:pet_id>/delete', methods=['GET', 'POST'])      
+@app.route('/pet/<int:pet_id>/delete', methods=['GET', 'POST'])    
 def delete_pet(pet_id):
 
     connection = get_db_connection()
@@ -260,9 +321,6 @@ def delete_pet(pet_id):
 #Null, zum Ausleihen
 @app.route('/pet/<int:pet_id>/borrow', methods=['GET', 'POST'])
 def borrow_pet(pet_id):
-    # user_id = session.get('user_id') # Nur in Vorbereitung, noch keine Sessions implementiert
-    # if not user_id:
-    #     abort(401) # Bitch, you're not logged in
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -276,7 +334,7 @@ def borrow_pet(pet_id):
                    from pets 
                    where pet_id = %s
                    ''',
-                   (user_id, pet_id,)
+                   (session['user_id'], pet_id,)
                    )
     status = cursor.fetchone()
 
@@ -290,7 +348,7 @@ def borrow_pet(pet_id):
                         insert into borrowings (pet_id, borrower_id)
                     values (%s, %s)
                     ''',
-                    (pet_id, user_id,)
+                    (pet_id, session['user_id'],)
                     )
     
         connection.commit()
@@ -300,7 +358,7 @@ def borrow_pet(pet_id):
         return redirect(url_for('pet', pet_id=pet_id))
 
 
-@app.route('/pet/<int:pet_id>/return', methods=['GET', 'POST'])      
+@app.route('/pet/<int:pet_id>/return', methods=['GET', 'POST'])
 def return_pet(pet_id):
 
     connection = get_db_connection()
@@ -313,7 +371,7 @@ def return_pet(pet_id):
                    and borrower_id = %s
                    and active = 1
                    ''', 
-                   (pet_id, user_id,)) #user_id temporär aus globaler Variable, später session_id
+                   (pet_id, session['user_id'],)) #user_id temporär aus globaler Variable, später session_id
     
     connection.commit()
     returned = cursor.rowcount #zählt die tatsächlich veränderten Datensätze, wenn erfolgreich dann >= 1
@@ -376,7 +434,7 @@ def pet_management(user_id):
 
 
 #Seite zum Anlegen neuer Tiere
-@app.route('/pet/new/<int:user_id>', methods=['GET', 'POST']) #Brauche hier eig. gar keine Get-Method     
+@app.route('/pet/new/<int:user_id>', methods=['GET', 'POST'])
 def pet_new(user_id):
 
     if request.method == 'POST':
@@ -424,6 +482,7 @@ def pet_new(user_id):
 
     else:
         return render_template('pet_new.html')
+
 
 #Fallback auf die angelegte Fehlerseite
 @app.errorhandler(404)
