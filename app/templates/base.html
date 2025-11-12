@@ -43,7 +43,7 @@
           <ul class="nav-links">
             {% if session['name'] %}
             <li><a href="{{ url_for('logout') }}">Abmelden</a></li>
-            <li><a href="{{ url_for('pet_management', user_id=session['user_id']) }}">Meine Haustiere</a></li>
+            <li><a href="{{ url_for('pet_management')}}">Meine Haustiere</a></li>
             {% else %}
             <li><a href="{{ url_for('login_get') }}">Login</a></li>
             <li><a href="{{ url_for('register_get') }}">Registrieren</a></li>

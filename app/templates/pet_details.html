@@ -19,9 +19,11 @@
       {% if not pet.is_borrowed %}
         <p>Status: <b>Verfügbar</b></p>
         
-        <!-- Anzeigen wenn aktueller User nicht Besitzer ist -->
-        {% if pet.owner_id != session['user_id'] %}
-          <a href="/pet/{{ pet.pet_id }}/borrow">Ausleihen</a>
+        {% if session['user_id'] %}
+          <!-- Anzeigen wenn aktueller User nicht Besitzer ist -->
+          {% if pet.owner_id != session['user_id'] %}
+            <a href="/pet/{{ pet.pet_id }}/borrow">Ausleihen</a>
+          {% endif %}
         {% endif %}
 
       {% else %}
