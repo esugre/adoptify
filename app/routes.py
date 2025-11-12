@@ -14,8 +14,16 @@ app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 # Erlaubte Dateien für den Upload
 allowed_extensions = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
-#Temporäre globale user_id (nicht vergessen, die übergebenen user_ids wieder aus den routes zu löschen)
-# user_id = 2
+
+#Wrapper für Login-Prüfung
+def login_required(_):
+    @wraps(_)
+    def mcwrappenstein(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return _(*args, **kwargs)
+    return mcwrappenstein
+
 
 #Überprüfungsfunktion ob das hochgeladene File eine zulässige Datei ist, nötig für den Bildupload in pet_new()
 def allowed_file(filename):
@@ -92,10 +100,37 @@ def login_post():
     user = cursor.fetchone()
     connection.close()
 
-    if not user or not check_password_hash(user['password'], entered_password):
-        flash("Benutzer oder Passwort nicht korrekt.", "error")
+    #Passwort überprüfen, primär gehasht, aber mit Klartext-Fallback für die alten Nutzer
+    ok = False
+    if user:
+        pw_hash = user['password']
+        if pw_hash:
+            ok = check_password_hash(pw_hash, entered_password)
+        else:
+            #Überbleibsel mit Klartext-Pws in DB
+            plain_pw = user['password']
+            if plain_pw is not None and plain_pw == entered_password:
+                ok = True
+                #Direkt überschreiben mit Hash + Plaintext löschen
+                new_hash = generate_password_hash(entered_password)
+                connection = get_db_connection()
+                cursor = connection.cursor()
+                cursor.execute('''
+                                update users 
+                               set password = %s 
+                               where user_id = %s
+                                ''',
+                                (new_hash, user['user_id'])
+                                )
+                
+                connection.commit()
+                connection.close()
+    
+    if not ok:
+        flash("Benutzer oder Password nicht korrekt.", "error")
         return redirect(url_for('login_get'))
-
+    
+    # Jetzt die Session setzen
     session.clear() #Session löschen, falls noch irgendwelche alten Daten drin sein könnten
     session['user_id'] = int(user['user_id'])
     session['name'] = user['name']
@@ -225,6 +260,7 @@ def pet(pet_id):
 
 # Tier Bearbeiten - Verschlankt - Daten mittels SQL vorsortiert
 @app.route('/pet/<int:pet_id>/edit', methods=['GET', 'POST'])
+@login_required
 def pet_edit(pet_id):
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -288,7 +324,7 @@ def delete_pet(pet_id):
         flash("Hm, hier stimmt was nicht.", "error")
         return redirect(url_for('index'))
     
-    if del_pet['owner_id'] != user_id:
+    if del_pet['owner_id'] != session['user_id']: 
         connection.close()
         flash("Das ist nicht dein Tier, Finger weg!", "error")
         return redirect(url_for('pet', pet_id=pet_id))
@@ -386,8 +422,9 @@ def return_pet(pet_id):
 
 
 # Tierverwaltung - Verschlankt - Information direkt per SQL wie benötigt, statt mittels Python Loops after Loops...
-@app.route('/pet-management/<int:user_id>')
-def pet_management(user_id):
+@app.route('/pet-management')
+def pet_management():
+    user_id = session['user_id']
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
     cursor.execute('''
@@ -434,9 +471,9 @@ def pet_management(user_id):
 
 
 #Seite zum Anlegen neuer Tiere
-@app.route('/pet/new/<int:user_id>', methods=['GET', 'POST'])
-def pet_new(user_id):
-
+@app.route('/pet/new', methods=['GET', 'POST'])
+def pet_new():
+    user_id = session['user_id']
     if request.method == 'POST':
 
         name = request.form['name']
@@ -478,7 +515,7 @@ def pet_new(user_id):
 
 
         #Weiterleitung / Zurück zur Tier-Verwaltung
-        return redirect(url_for('pet_management', user_id=user_id))
+        return redirect(url_for('pet_management'))
 
     else:
         return render_template('pet_new.html')
