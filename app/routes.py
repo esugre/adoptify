@@ -100,33 +100,39 @@ def login_post():
     user = cursor.fetchone()
     connection.close()
 
-    #Passwort überprüfen, primär gehasht, aber mit Klartext-Fallback für die alten Nutzer
+    if not user:
+        flash("Benutzername oder Passwort nicht korrekt.", "error")
+        return redirect(url_for('login_get'))
+    
+    stored = user['password']
+    #check ob pw schon gehashed oder nicht mit werkzeug default sha256: "scrypt:..."
+    is_hashed = stored.startswith("scrypt:")
+
     ok = False
-    if user:
-        pw_hash = user['password']
-        if pw_hash:
-            ok = check_password_hash(pw_hash, entered_password)
-        else:
-            #Überbleibsel mit Klartext-Pws in DB
-            plain_pw = user['password']
-            if plain_pw is not None and plain_pw == entered_password:
-                ok = True
-                #Direkt überschreiben mit Hash + Plaintext löschen
-                new_hash = generate_password_hash(entered_password)
-                connection = get_db_connection()
-                cursor = connection.cursor()
-                cursor.execute('''
-                                update users 
-                               set password = %s 
-                               where user_id = %s
-                                ''',
-                                (new_hash, user['user_id'])
-                                )
-                
-                connection.commit()
-                connection.close()
+    if is_hashed:
+        ok = check_password_hash(stored, entered_password)
+    
+    else:
+        ok = (stored == entered_password)
+        if ok:
+            #Passwort Migration des Altbestands starten
+            new_hash = generate_password_hash(entered_password)
+
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            cursor.execute('''
+                            update users 
+                            set password = %s 
+                            where user_id = %s
+                            ''',
+                            (new_hash, user['user_id'])
+                            )
+            
+            connection.commit()
+            connection.close()
     
     if not ok:
+        # also keine Übereinstimmung -> zurück zum login
         flash("Benutzer oder Password nicht korrekt.", "error")
         return redirect(url_for('login_get'))
     
