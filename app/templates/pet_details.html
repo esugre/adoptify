@@ -20,7 +20,7 @@
         <p>Status: <b>Verfügbar</b></p>
         
         <!-- Anzeigen wenn aktueller User nicht Besitzer ist -->
-        {% if pet.owner_id != user_id %}
+        {% if pet.owner_id != session['user_id'] %}
           <a href="/pet/{{ pet.pet_id }}/borrow">Ausleihen</a>
         {% endif %}
 
@@ -28,14 +28,14 @@
         <p>Status: <b>Verliehen</b></p>
 
         <!-- Nur der aktuelle Ausleiher kann auch zurückgeben -->
-         {% if pet.borrower_id == user_id %}
+         {% if pet.borrower_id == session['user_id'] %}
           <a href="/pet/{{ pet.pet_id }}/return">Zurückgeben</a>
          {% endif %}
 
       {% endif %}
 
       <!--Bearbeiten nur Anzeigen wenn user = owner-->
-      {% if pet.owner_id == user_id %}
+      {% if pet.owner_id == session['user_id'] %}
         <a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a>
       {% endif %}
 
