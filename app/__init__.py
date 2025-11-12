@@ -4,5 +4,4 @@ app = Flask(__name__)
 
 from app import routes
 
-# Vorbereitung für Sessions
-app.secret_key = 'geheimigeheimenstein'
+app.config.from_pyfile('config.py')
