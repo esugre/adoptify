@@ -1,0 +1,17 @@
+
+{% extends 'base.html' %}
+
+    {% block content %}
+
+        <main class="login">
+            <form action="" method="POST" class="login-form">
+                <h2>Konto Anmeldung</h2>
+                <label for="username">Benutzername:</label>
+                <input type="text" name="username" id="username" required>
+                <label for="password">Passwort wählen:</label>
+                <input type="text" name="password" id="password" required>
+                <button type="submit" class="submit-button">Einloggen</button>
+            </form>
+        </main>
+
+{% endblock %}
