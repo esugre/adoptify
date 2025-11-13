@@ -1,221 +1,509 @@
 
+/* Farb-Thema mithilfe von root-Variablen */
+/* Basis Styling */
 
-html, body {                            /* Selbe Regeln für html als auch body */
-  height: 100%;                         /* Damit der Body so hoch ist wie das gesamte Fenster vom Browser */
-  margin: 0;                            /* Entfernt den Standard-Abstand nach Außen, wickeln den Browser um den Body quasi */
-  background: var(--bg);
-  color: var(--fg);
-  font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; /*Schriftgröße 16px, Zeilenhöhe 1.5, Schriftarten als Fallback*/
+:root {
+    --bg: #f8fafc;
+    --bg-alt: #ffffff;
+    --fg: #111827;
+    --fg-soft: #4b5563;
+
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --accent-strong: #1d4ed8;
+
+    --border-subtle: #e5e7eb;
+    --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+    --radius-card: 12px;
+
+    --font-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
 }
 
-.pet-list {                             /*Elternelement mit mehreren Tierkarten*/
-
-display: flex;                          /* Flexbox, damit die Karten nebeneinander angeordnet werden*/
-margin: 30px;                           /* Rundherum Außenabstand von 30px zum restlichen Inhalt*/
-flex-flow: row wrap;                    /* Elemente in einer Reihe anordnen, bei Platzmangel umbrechen*/
-justify-content: space-evenly;          /* Gleichmäßiger Abstand zwischen den Karten*/
-border: 1px solid #e3e3e3;            /* Leichter Rahmen um die Liste der Karten*/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-.pet-card {                             /* Styling für jede einzelne Karte */
-
-position:relative;                      /*Boah, wie erklär ich das Later-Rafi... Fungiert als Bezugspunkt für absolute Positionierungen innerhalb der Karte (z.B. Verfügbarkeit unten)*/
-margin: 10px;                           /*10x Außenabstand rundherum zwischen den Karten*/
-padding: 15px;                          /*15px Innenabstand innerhalb der Karte*/
-width: 300px;                           /*Feste Breite der Karte*/
-height: 400px;                          /*Feste Höhe der Karte*/
-border: 1px solid #e3e3e3;            /*Leichter Rahmen um die Karte*/
-
+html, body {
+    height: 100%; 
+    margin: 0;
+    padding: 0;
 }
 
-.pet-card h2 { 
-
-margin-top: 0;                          /* Entfernt den Standard-Abstand oben beim Überschriften-Element */
-
+body {
+    background: radial-gradient(circle at top left, #fdf2f8 0, f8fafc 40%, #eff6ff 100%);
+    color: var(--fg);
+    font: 16px/1.6 var(--font-base);
 }
 
-.card-link {                            /* Macht die gesamte Karte anklickbar */
-
-position: absolute;                     /*fixiert den Link innerhalb der Karte unabhängig von anderen Elementen, deswegen brauchen wir den Bezugspunkt oben*/
-bottom: 15px;                           /* Abstand von unten innerhalb der Karte */
-left: 15px;                             /* Abstand von links innerhalb der Karte */
-
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 3rem;
 }
 
-.available-or-not {                      /* Selbes Spiel wie bei den card-links */
+/* Header/Navi */
 
-position: absolute; 
-bottom: 30px;
-
-text-align: center;                       /* Zentriert den Text innerhalb des Elements */
-
+.site-header {
+    background: #fff;
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
-.image-wrapper {                          /* Container für das Bild innerhalb der Karte */
-
-width: 100%;                              /* Um die volle Breite der Karte auszunutzen */
-height: 200px;                            /* Aber fixe Höhe, für gleichmäßigere Karten*/
-overflow: hidden;                         /* Alles was über den Container schwengelt wird abgeschnibbelt */
-
+.nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    gap: 1.5rem;
 }
 
-.image-wrapper img {                      /* Styling für das Bild im Container, zb Größenanpassung */
-
-width: 100%;
-height: 100%;
-object-fit: cover;                        /* Skaliert das Bild das es den Container voll ausfüllt */
-object-position: center;                  /* Zentriert das Bild im Container */
-display: block;                           /* Entfernt diesen weißen Rand unter dem Bild */
-
-}
-
-/* Navi-Styling */
-
-.site-header {                            /* Header Bereich der geweißelt wird mit ner kleinen grauen Trennlinie drunter */
-  background: #fff8f0;                  /* Hellere Hintergrundfarbe, passend zum Logo */
-  border-bottom: 1px solid #eee;
-}
-
-.nav {                                    /* Die ganze Navi-Leiste betreffend */
-  display: flex;                          /* Horizontale Anordnung */
-  align-items: center;                    /* Vertikale Zentrierung der Elemente */
-  padding: .75rem 1rem;                   /* Innenabstand oben/unten 0.75rem, links/rechts 1rem */
-  gap: 1rem;                              /* Abstand zwischen den Elementen */
-}
-
-/* rem -> "root em", also 1rem entspricht der Schriftgröße des html-Elements
-  Dadurch kann man seine Abstände relativ zu der genutzten Schriftgröße angeben.
-  Das ist super wenn man z.B. später die Schriftgröße ändert, dann passt sich alles über rem automatisch an. 
-*/
-
-/* Linke Seite mit Brand und Slogan */
-
-.brand {  
-  display: flex;                          /* Flexbox für horizontale Anordnung */
-  align-items:center;                     /* statt baseline, damit logo, link und slogan selbe grundlinie haben */
-  gap: .75rem;                            /* Abstand zwischen Brand-Name und Slogan */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .brand-link {
-  display: flex;
-  align-items: center;                    /* Vertikale Zentrierung */
-  text-decoration: none;                  /* Entfernt Unterstreichung */
-  color: inherit;                         /* Erbt die Textfarbe vom übergeordneten Element */
-  gap: .5rem;                             /* Abstand zwischen Logo und Brand-Name */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: inherit;
 }
 
 .brand-logo {
-  height: 28px;
-  width: auto;
-  vertical-align: middle;               /* Vertikale Ausrichtung in der Mitte */
+    height: 30px;
+    width: auto;
+    vertical-align: middle;
 }
 
 .brand-name {
-  font-weight: 700;                       /* Fettgedruckt */
-  text-decoration: none;                  /* Entfernt Unterstreichung */
-  color: inherit;                         /* Erbt die Textfarbe vom übergeordneten Element */
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
+
+/* Schlologan */
 
 .slogan {
-  font-size: .9rem;                       /* Etwas kleinere Schriftgröße */
-  opacity: .7;                            /* Leicht transparent für dezenteren Look */
-  font-weight: 400;                       /* Normale Schriftstärke */
+    font-size: 0.85rem;
+    opacity: 0.75;
 }
 
-/* Rechte Seite mit der eigentlichen Navigation */
+/* Navigation */
 
 .nav-links {
-  margin-left: auto;                      /* Schiebt die Links ganz nach rechts */
-  display: flex;                          /* Listenelemente nebeneinander setzen */
-  gap: 1rem;                              /* Abstand von 1rem zwischen den Links */
-  list-style: none;                       /* Schmeißt die Aufzählungspunkte raus */
-  padding: 0;                             /* Standard Innenabstand entfernen */
-  margin-top: 0; 
-  margin-bottom: 0;                       /* Standard Außenabstand oben und unten entfernen */
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .nav-links a {
-  text-decoration: none;                  /* Unterstriche rausschmeißen */
-  padding: .5rem .75rem;                  /* Innenabstand de r Klickfläche */
-  border-radius: .5rem;                   /* Abgerundete Ecken, for the looook */
-  color: inherit;                         /* TExtfarbe erben */
+    text-decoration: none;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    color: var(--fg-soft);
+    font-size: 0.95rem;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
 }
 
-.nav-links a:hover,                       /* Neu gelernt, bei Tastaturbedienung auch den Fokuszustand anpassen */
+.nav-links a:hover,
 .nav-links a:focus {
-  background: #f0f0f0;                  /* Heller Hintergrund beim Drüberfahren oder Fokussieren */
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    outline: none;
+    transform: translateY(-1px);
 }
 
+/* Pets */
 
-
-/* Zusätzliche Styles für die Admin-Dashboard und Tierverwaltungsseiten */
-
-.admin-dashboard {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-collapse: separate;              /* Getrennte Zellen, damit das Spacing funktionuckelt, collapse würde die Zellenränder der eigenen mit den Nachbarszellen verschmelzen */
-  border-spacing: 15px 0px;               /* Abstand zwischen den Spalten 15px, und oben/unten 0 Abstände */
+.pet-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin: 2rem;
+    padding: 1rem 0;
 }
 
-.pet-management {
-  display: flex;
-  flex-direction: column;                 /* Vertikale Anordnung der Elemente */
-  align-items: center;                    /* Zentriert die Elemente horizontal */
-  gap: 20px;                              /* Abstand von 20px zwischen den Elementen */
+/* Pet Cards */
+
+.pet-card {
+    position: relative;
+    width: 280px;
+    min-height: 360px;
+    background: var(--bg-alt);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    padding: 1rem 1rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
 }
 
-.pet-management table {
-  display: flex; 
-  align-items: center;
-  justify-content: center;
-  border-collapse: separate;             /* Getrennte Zellen, damit das Spacing funktionuckelt, collapse würde die Zellenränder der eigenen mit den Nachbarszellen verschmelzen */
-  border-spacing: 15px 0px;              /* Abstand zwischen den Spalten 15px, und oben/unten 0 Abstände */
+.pet-card h2 {
+    margin: 0.5rem 0 0.15rem;
+    font-size: 1.2rem;
 }
 
-.borrowed-pets-table {
-  margin-bottom: 60px;                   /* Abstand von unten, damit es nicht so gequetscht aussieht */
+.pet-card p {
+    margin: 0;
+    color: var(--fg-soft);
+    font-size: 0.95rem;
 }
+
+.image-wrapper {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #e5e7eb;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* Verfügbar ?! */
+
+.available-or-not {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.available-or-not.unavailable {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+
+.card-link {
+    margin-top: auto;
+    align-self: flex-start;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-strong);
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: #eff6ff;
+    transition: background-color 0.15s ease, transform 0.08s ease;
+}
+
+.card-link:hover,
+.card-link:focus {
+    background: var(--accent-soft);
+    transform: translateY(-1px);
+}
+
+/* Index Head/Überschriften */
 
 .index-head {
-  display: flex;
-  flex-direction: column;                /* Vertikale Anordnung der Elemente */
-  align-items: center;                   /* Abstand nach unten, damit es nicht so gequetscht aussieht */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 2rem;
 }
 
+.index-head h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.index-head p {
+    margin: 0;
+    color: var(--fg-soft);
+}
+
+/* Pet Infos */
+
 .pet-details {
-  display: flex;
-  gap: 30px;                             /* Abstand zwischen Bild und Text */
-  margin: 0 auto;                        /* Zentriert den gesamten Container horizontal */
-  padding: 1rem;                         /* Innenabstand rundherum */
-  align-items: center;
-  justify-content: center;
-  margin-top: 50px;                      /* Abstand von oben */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin: 3rem auto 0;
+    padding: 1.5rem;
+    background: var(--bg-alt);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    align-items: flex-start;
+    justify-content: center;
 }
 
 .pet-image img {
-  max-width: 500px; 
-  height: auto;
+    max-width: 400px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
 }
+
+.pet-details .description {
+    max-width: 420px;
+    color: var(--fg-soft);
+}
+
+/* Admin Dashboard/Tabellen */
+
+.admin-dashboard {
+    width: 100%;
+    margin: 2rem auto;
+    border-collapse: collapse;
+    background: var(--bg-alt);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+}
+
+.admin-dashboard th,
+.admin-dashboard td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.admin-dashboard thead {
+    background: var(--accent);
+    color: #fff;
+}
+
+.admin-dashboard tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+.admin-dashboard tbody tr:hover {
+    background: #eff6ff;
+}
+
+/* Tabellen im Pet-Management */
+
+.pet-management {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.pet-management table {
+    width: 100%;
+    max-width: 900px;
+    border-collapse: collapse;
+    background: var(--bg-alt);
+    border-radius: var(--radius-card);;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+}
+
+.pet-management th,
+.pet-management td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.95rem;
+}
+
+.pet-management thead {
+    background: var(--accent-soft);
+}
+
+.borrowed-pets-table {
+    margin-bottom: 3rem;
+}
+
+/* allgemeines edit-formular */
 
 .edit-formular {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75;
+    max-width: 480px;
+    margin: 2.5rem auto;
+    padding: 2rem;
+    background: var(--bg-alt);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
 }
 
-/* Flash-Meldungen */
+.edit-formular label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.edit-formular input,
+.edit-formular select,
+.edit-formular textarea {
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    background-color: #f9fafb;
+    font: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.edit-formular input:focus,
+.edit-formular select:focus,
+.edit-formular textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99, 235, 0.18);
+    background: #ffffff;
+}
+
+/* Buttons */
+
+button,
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: none;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.15s ease, transform 0.08s ease, box-shadow 0.15s ease;
+}
+
+button:hover,
+.button:hover {
+    background: var(--accent-strong);
+    box-shadow: 0 8px 20px rgba(37,99, 235, 0.4);
+    transform: translateY(-1px);
+}
+
+button:active,
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(37,99, 235, 0.35);
+}
+
+/* Flash Mitteilungen */
+
+.flashes {
+    max-width: 600px;
+    margin: 1.5rem auto 0;
+    padding: 0;
+    list-style: none;
+}
+
+.flashes li {
+    margin-bottom: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
 .flashes .error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: red
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
 }
 
 .flashes .success {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: green
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+/* Login/Register */
+
+main.login {
+    max-width: none;
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+.login-form {
+    background: var(--bg-alt);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
+    padding: 2.25rem 2.5rem;
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.login-form h2 {
+    margin: 0 0 0.5rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.login-form label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.login-form input {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+    background-color: #f9fafb;
+    font: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37,99, 235, 0.18);
+}
+
+.submit-button {
+    margin-top: 0.8rem;
+}
+
+/* More Responsiveness */
+
+@media (max-width: 768px) {
+    .nav {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .slogan {
+        display: none;
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    .pet-details {
+        padding: 1.25rem;
+    }
 }
