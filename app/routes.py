@@ -486,6 +486,11 @@ def pet_new():
         animal_type = request.form['animal_type']
         description = request.form['description']
 
+        if not name.strip() or not animal_type.strip():
+            flash("Bitte gib mindestens Namen & Tierart an!", "error")
+            return render_template('pet_new.html')
+
+
         #Standardmäßig kein Bild
         image = None
 
