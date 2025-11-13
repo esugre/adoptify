@@ -2,7 +2,7 @@
 {% block title %}Adoptify - Tier anlegen{% endblock %}
 {% block content %}
 
-    <div class="newpet-form">
+    <div class="edit-formular">
         
         <h1>Neues Haustier anlegen</h1>
 
@@ -17,7 +17,7 @@
             <label for="description">Beschreibung:</label><br>
             <textarea id="description" name="description" maxlength="200" rows="5" cols="40"></textarea><br><br>
 
-            <label for="image">Profilbild</label><br>
+            <label for="image" class="file-upload">Datei auswählen</label><br>
             <input type="file" id="image" name="image" accept="image/*"><br>
 
             <button type="submit">Speichern & Zurück</button>

@@ -8,7 +8,7 @@
 
     <h2>Deine Haustiere:</h2>
 
-    <a href="{{ url_for('pet_new') }}">Neuen Freund anlegen</a> 
+    <a href="{{ url_for('pet_new') }}" class="newpet-link">Neuen Freund anlegen</a> 
 
             <table>
                 <tr>
@@ -23,9 +23,9 @@
                     <td>{{ pet.name }}</td>
                     <td>{{ pet.animal_type }}</td>
                     <td>{{ pet.status }}</td>
-                    <td><a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a> 
-                        <a href="/pet/{{ pet.pet_id }}">Details</a>
-                        <a href="/pet/{{ pet.pet_id }}/delete">Löschen</a>
+                    <td><a href="/pet/{{ pet.pet_id }}/edit" class="card-link">Bearbeiten</a> 
+                        <a href="/pet/{{ pet.pet_id }}" class="card-link">Details</a>
+                        <a href="/pet/{{ pet.pet_id }}/delete" class="card-link">Löschen</a>
                     </td>
                 </tr>
 
@@ -48,7 +48,7 @@
                     <td>{{ pet.name }}</td>
                     <td>{{ pet.animal_type }}</td>
                     <td>{{ pet.owner_id }}</td>
-                    <td> <a href="/pet/{{ pet.pet_id }}">Details</a></td>
+                    <td> <a href="/pet/{{ pet.pet_id }}" class="card-link">Details</a></td>
                 </tr>
 
                 {% endfor %}

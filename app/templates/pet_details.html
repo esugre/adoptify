@@ -9,7 +9,7 @@
     </figure>
 
     <section class="pet-info">
-      <a href="{{ url_for('index') }}">Zurück zur Übersicht</a>
+      <a href="{{ url_for('index') }}" class="card-link">Zurück zur Übersicht</a>
 
       <h1>{{ pet.name }}</h1>
       <p><strong>Tierart:</strong> {{ pet.animal_type }}</p>
@@ -22,7 +22,7 @@
         {% if session['user_id'] %}
           <!-- Anzeigen wenn aktueller User nicht Besitzer ist -->
           {% if pet.owner_id != session['user_id'] %}
-            <a href="/pet/{{ pet.pet_id }}/borrow">Ausleihen</a>
+            <a href="/pet/{{ pet.pet_id }}/borrow" class="card-link">Ausleihen</a>
           {% endif %}
         {% endif %}
 
@@ -31,18 +31,18 @@
 
         <!-- Nur der aktuelle Ausleiher kann auch zurückgeben -->
          {% if pet.borrower_id == session['user_id'] %}
-          <a href="/pet/{{ pet.pet_id }}/return">Zurückgeben</a>
+          <a href="/pet/{{ pet.pet_id }}/return" class="card-link">Zurückgeben</a>
          {% endif %}
 
       {% endif %}
 
       <!--Bearbeiten nur Anzeigen wenn user = owner-->
       {% if pet.owner_id == session['user_id'] %}
-        <a href="/pet/{{ pet.pet_id }}/edit">Bearbeiten</a>
+        <a href="/pet/{{ pet.pet_id }}/edit" class="card-link">Bearbeiten</a>
       {% endif %}
 
     </section>
 
-  </div>>
+  </div>
 
 {% endblock %}

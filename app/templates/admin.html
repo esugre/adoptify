@@ -2,15 +2,14 @@
 {% block title %}Adoptify - Admin-Dashboard{% endblock %}
 {% block content %}
 
-<h1 class="admin-dashboard">User Management Dashboard</h1>
+<h1 class="admin-title">User Management Dashboard</h1>
 
     <table class="admin-dashboard">
         <tr>
             <th>User-ID</th>
             <th>Name</th>
             <th>Rolle</th>
-            <th>Rechte</th>
-            <th>User</th>
+            <th>Aktionen</th>
         </tr>
 
         {% for u in user %}
@@ -18,8 +17,8 @@
             <td>{{ u.user_id }}</td>
             <td>{{ u.name }}</td>
             <td>{{ u.role }}</td>
-            <td><a href="{{ url_for('edit_user', user_id=u.user_id) }}">Bearbeiten</a></td>
-            <td><a href="{{ url_for('delete_user', user_id=u.user_id) }}">Löschen</a></td>
+            <td><a href="{{ url_for('edit_user', user_id=u.user_id) }}" class="card-link">Bearbeiten</a>
+            <a href="{{ url_for('delete_user', user_id=u.user_id) }}" class="card-link">Löschen</a></td>
         </tr>
 
         {% endfor %}
