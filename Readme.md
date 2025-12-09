@@ -11,7 +11,7 @@ Adoptify ist eine kleine Webanwendung, die als Lernprojekt entstanden ist. Ziel 
 ## Tech-Stack
 
 * HTML, CSS, JavaScript
-* (Optional: Backend folgt später)
+* Backend Python, Flask
 
 ## Status
 
